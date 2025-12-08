@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { MoreHorizontal, Plus, Eye, Edit, Trash2, Calendar, Users, User } from 'lucide-react';
+import { MoreHorizontal, Plus, Eye, Edit, Trash2, Calendar, Users } from 'lucide-react';
 import CreateTask from './CreateTask';
 import UpdateTask from './UpdateTask';
 import { toast } from 'sonner';
@@ -131,7 +131,7 @@ const handleDelete = async () => {
         </div>
         <Button 
           onClick={() => setIsCreateOpen(true)}
-          className="bg-[#2b564e] hover:bg-[#2b564e]/90 text-white w-full sm:w-auto"
+          className="bg-[#2b564e] hover:bg-[#2b564e]/90 text-white w-full sm:w-auto rounded-none"
         >
           <Plus className="mr-2 h-4 w-4" />
           Create Task
@@ -139,7 +139,7 @@ const handleDelete = async () => {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden lg:block border rounded-lg bg-white dark:bg-gray-900">
+      <div className="hidden lg:block border bg-white dark:bg-[#101010]">
         <Table>
           <TableHeader>
             <TableRow>
@@ -148,7 +148,7 @@ const handleDelete = async () => {
               <TableHead className="font-semibold">Start Date</TableHead>
               <TableHead className="font-semibold">Deadline</TableHead>
               <TableHead className="font-semibold">Created By</TableHead>
-              <TableHead className="font-semibold">Assigned Users</TableHead>
+              <TableHead className="font-semibold">Team Members</TableHead>
               <TableHead className="font-semibold text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -172,7 +172,7 @@ const handleDelete = async () => {
                   <div className="flex items-center space-x-2">
                     <div>
                       <p className="font-medium">{task.createdBy.name}</p>
-                      <p className="text-sm text-gray-500">{task.createdBy.email}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{task.createdBy.email}</p>
                     </div>
                   </div>
                 </TableCell>
@@ -239,7 +239,7 @@ const handleDelete = async () => {
         {tasks.map((task) => (
           <div 
             key={task._id} 
-            className="border rounded-lg bg-white dark:bg-gray-900 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+            className="border bg-white dark:bg-[#101010] p-4 cursor-pointer"
           >
             {/* Header Section */}
             <div className="flex justify-between items-start mb-4">
@@ -285,7 +285,7 @@ const handleDelete = async () => {
                   'bg-yellow-500'
                 }`}></div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Status</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Status</p>
                   <p className="text-sm font-medium capitalize">
                     {task.status.replace('_', ' ')}
                   </p>
@@ -295,23 +295,39 @@ const handleDelete = async () => {
               <div className="flex items-start gap-2">
                 <Calendar className="h-4 w-4 text-gray-400" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Deadline</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Deadline</p>
                   <p className="text-sm font-medium">{formatDate(task.deadline)}</p>
                 </div>
               </div>
             </div>
 
             {/* Assigned Users and Created By */}
+            
             <div className="flex items-center justify-between">
               <div className="flex items-start gap-2">
-                <Users className="h-4 w-4 text-gray-400" />
+                <img
+                      src={task.createdBy.display_image}
+                      alt={task.createdBy.name}
+                      className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800 object-cover"
+                    />
+                <div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Created By</p>
+                  <p className="text-sm font-medium truncate max-w-[120px]">
+                    {task.createdBy.name}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                 <Users className="h-4 w-4 text-gray-400" />
+              <div className="flex flex-col items-start">
+                <p className="text-xs text-gray-600 dark:text-gray-400">Team Members</p>
                 <div className="flex -space-x-2 mt-1">
                   {task.assignedUsers.slice(0, 3).map((user) => (
                     <div key={user._id} title={user.name}>
                       <img
                         src={user.display_image}
                         alt={user.name}
-                        className="w-8 h-8 rounded-full border-2 border-white dark:border-gray-800 object-cover"
+                        className="w-7 h-7 rounded-full border-2 border-white dark:border-gray-800 object-cover"
                       />
                     </div>
                   ))}
@@ -322,15 +338,6 @@ const handleDelete = async () => {
                   )}
                 </div>
               </div>
-              
-              <div className="flex items-start gap-2">
-                <User className="h-4 w-4 text-gray-400" />
-                <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Created By</p>
-                  <p className="text-sm font-medium truncate max-w-[120px]">
-                    {task.createdBy.name}
-                  </p>
-                </div>
               </div>
             </div>
 

@@ -77,7 +77,7 @@ export default function Works({ taskId, taskTitle }: WorksProps) {
         </div>
         <Button
           onClick={() => setIsCreateOpen(true)}
-          className="bg-[#2b564e] hover:bg-[#2b564e]/90 text-white w-full sm:w-auto"
+          className="bg-[#2b564e] hover:bg-[#2b564e]/90 text-white w-full sm:w-auto rounded-none"
         >
           <Plus className="mr-2 h-4 w-4" />
           Add Work
@@ -86,7 +86,7 @@ export default function Works({ taskId, taskTitle }: WorksProps) {
 
       {/* Works Grid */}
       {works.length === 0 ? (
-        <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-12 text-center">
+        <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 p-12 text-center bg-white">
           <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
             <Plus className="h-8 w-8 text-gray-400" />
           </div>
@@ -98,7 +98,7 @@ export default function Works({ taskId, taskTitle }: WorksProps) {
           </p>
           <Button
             onClick={() => setIsCreateOpen(true)}
-            className="bg-[#2b564e] hover:bg-[#2b564e]/90"
+            className="bg-[#2b564e] hover:bg-[#2b564e]/90 rounded-none"
           >
             <Plus className="mr-2 h-4 w-4" />
             Add Your First Work

@@ -87,7 +87,7 @@ export default function TaskDetailPage() {
   const StatusIcon = statusConfig.icon;
 
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6">
+    <div className="max-w-6xl mx-auto sm:p-6">
       {/* Back button */}
       <Button
         variant="ghost"
@@ -126,12 +126,12 @@ export default function TaskDetailPage() {
       <div className="space-y-6">
         {/* Timeline */}
         <div>
-          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">TIMELINE</h2>
+          <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">TIMELINE</h2>
           <div className="space-y-4">
             <div className="flex">
               <Calendar className="h-5 w-5 text-gray-400 mr-3" />
               <div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Start Date</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Start Date</div>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {format(new Date(task.startDate), 'MMMM d, yyyy')}
                 </p>
@@ -141,7 +141,7 @@ export default function TaskDetailPage() {
             <div className="flex ">
               <Clock className="h-5 w-5 text-gray-400 mr-3" />
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Deadline</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Deadline</p>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {format(new Date(task.deadline), 'MMMM d, yyyy')}
                 </p>
@@ -154,7 +154,7 @@ export default function TaskDetailPage() {
 
         {/* Created By */}
         <div>
-          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">CREATED BY</h2>
+          <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">CREATED BY</h2>
           <div className="flex items-center">
             <SafeImage
               src={
@@ -167,7 +167,7 @@ export default function TaskDetailPage() {
               className="w-10 h-10 rounded-full mr-3"
             />
             <div>          
-              <p className="text-sm text-gray-500 dark:text-gray-400">Creator</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Creator</p>
               <h3 className="font-medium text-gray-900 dark:text-white">{task.createdBy.name}</h3>
             </div>
           </div>
@@ -175,7 +175,7 @@ export default function TaskDetailPage() {
 
         {/* Assigned Users */}
         <div>
-          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+          <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
             ASSIGNED TO ({task.assignedUsers.length})
           </h2>
           <div className="flex flex-wrap gap-3">
@@ -195,7 +195,7 @@ export default function TaskDetailPage() {
                   <h3 className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</h3>
                   <p className="text-sm text-gray-700 dark:text-gray-300 mr-3">{user.email}</p>
                 </div>
-                <Separator orientation="vertical" />
+                <Separator className='hidden md:block' orientation="vertical" />
               </div>
             ))}
             

@@ -63,7 +63,7 @@ export default function UserSelect({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700"
+            className="w-full justify-between bg-white dark:bg-[#3c3c3c] border-gray-300 dark:border-gray-700 rounded-none"
             disabled={disabled || loading}
           >
             <div className="flex items-center gap-2">
@@ -72,7 +72,7 @@ export default function UserSelect({
                   {selectedUsers.slice(0, 3).map((user) => (
                     <Avatar
                       key={user._id}
-                      className="w-6 h-6 border-2 border-white dark:border-gray-800"
+                      className="w-6 h-6 border-2 border-white dark:border-[#3c3c3c]"
                     >
                       <AvatarImage src={user.display_image} />
                       <AvatarFallback className="text-xs">
@@ -81,7 +81,7 @@ export default function UserSelect({
                     </Avatar>
                   ))}
                   {selectedUsers.length > 3 && (
-                    <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-800 flex items-center justify-center text-xs">
+                    <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-[#3c3c3c] flex items-center justify-center text-xs">
                       +{selectedUsers.length - 3}
                     </div>
                   )}
@@ -93,7 +93,7 @@ export default function UserSelect({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700">
+        <PopoverContent className="w-full p-0 bg-white dark:bg-[#3c3c3c] border-gray-300 dark:border-gray-700">
           <Command>
             <CommandInput placeholder="Search users..." />
             <CommandList>
@@ -112,7 +112,7 @@ export default function UserSelect({
                           onChange([...value, user._id]);
                         }
                       }}
-                      className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                      className="cursor-pointer hover:bg-gray-100 dark:hover:bg-[#3c3c3c]"
                     >
                       <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-3">
@@ -150,7 +150,7 @@ export default function UserSelect({
             <Badge
               key={user._id}
               variant="secondary"
-              className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+              className="flex items-center gap-2 bg-gray-100 dark:bg-[#3c3c3c] text-gray-700 dark:text-gray-300"
             >
               <Avatar className="w-4 h-4">
                 <AvatarImage src={user.display_image} />

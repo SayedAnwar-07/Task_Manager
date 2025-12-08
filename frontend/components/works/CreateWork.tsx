@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Image as ImageIcon, Trash2, Upload } from 'lucide-react';
+import { Trash2, Upload } from 'lucide-react';
 import { workApi } from '@/lib/work-api';
 import { toast } from 'sonner';
 
@@ -36,8 +36,7 @@ export default function CreateWork({ taskId, open, onOpenChange, onSuccess }: Cr
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newImages = Array.from(files);
-      setImages([...images, ...newImages]);
+      setImages([...images, ...Array.from(files)]);
     }
   };
 
@@ -47,7 +46,7 @@ export default function CreateWork({ taskId, open, onOpenChange, onSuccess }: Cr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim()) {
       toast.error('Title is required');
       return;
@@ -59,7 +58,7 @@ export default function CreateWork({ taskId, open, onOpenChange, onSuccess }: Cr
         ...formData,
         images,
       });
-      
+
       toast.success('Work created successfully');
       onSuccess();
       resetForm();
@@ -71,127 +70,134 @@ export default function CreateWork({ taskId, open, onOpenChange, onSuccess }: Cr
   };
 
   const resetForm = () => {
-    setFormData({
-      title: '',
-      description: '',
-      timeRange: '',
-    });
+    setFormData({ title: '', description: '', timeRange: '' });
     setImages([]);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
+      <DialogContent
         className="
           sm:max-w-[600px]
-          bg-white dark:bg-gray-900
+          bg-white dark:bg-[#101010]
           max-h-[90vh]
-          h-full
           overflow-y-auto
+          border border-[#e5e5e5] dark:border-[#3c3c3c]
           rounded-none
-          sm:rounded-lg
         "
       >
         <DialogHeader>
-          <DialogTitle>Add New Work</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-xl font-semibold text-[#101010] dark:text-white">
+            Add New Work
+          </DialogTitle>
+          <DialogDescription className="text-sm text-gray-600 dark:text-gray-400">
             Submit your work for this task. You can add images to showcase your progress.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            <div>
-              <Label className='mb-2' htmlFor="title">Work Title *</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Enter work title"
-                required
-              />
-            </div>
-
-            <div>
-              <Label className='mb-2' htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Describe your work..."
-                rows={4}
-              />
-            </div>
-
-            <div>
-              <Label className='mb-2' htmlFor="timeRange">Time Range</Label>
-              <Input
-                id="timeRange"
-                value={formData.timeRange}
-                onChange={(e) => setFormData({ ...formData, timeRange: e.target.value })}
-                placeholder="e.g., 10am-2pm, 2-4pm"
-              />
-            </div>
-
-            <div>
-              <Label>Images (Optional)</Label>
-              <div className="mt-2">
-                <div className="flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Click to upload images
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        PNG, JPG, GIF up to 10MB
-                      </p>
-                    </div>
-                    <input
-                      type="file"
-                      className="hidden"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                    />
-                  </label>
-                </div>
-
-                {images.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-sm font-medium mb-2">
-                      Selected Images ({images.length})
-                    </p>
-                    <div className="grid grid-cols-4 gap-2">
-                      {images.map((image, index) => (
-                        <div key={index} className="relative group">
-                          <div className="aspect-square w-full rounded-lg border overflow-hidden bg-gray-100">
-                            <img
-                              src={URL.createObjectURL(image)}
-                              alt={`Preview ${index + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+          {/* Title */}
+          <div className="space-y-2">
+            <Label htmlFor="title" className="mb-2 text-[#101010] dark:text-gray-200 font-medium">
+              Work Title *
+            </Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="Enter work title"
+              className="bg-[#f5f5f5] dark:bg-[#3c3c3c] text-[#101010] dark:text-white border-none rounded-none"
+            />
           </div>
 
-          <DialogFooter>
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description" className="mb-2 text-[#101010] dark:text-gray-200 font-medium">
+              Description
+            </Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Describe your work..."
+              rows={4}
+              className="bg-[#f5f5f5] dark:bg-[#3c3c3c] text-[#101010] dark:text-white border-none rounded-none"
+            />
+          </div>
+
+          {/* Time Range */}
+          <div className="space-y-2">
+            <Label htmlFor="timeRange" className="mb-2 text-[#101010] dark:text-gray-200 font-medium">
+              Time Range
+            </Label>
+            <Input
+              id="timeRange"
+              value={formData.timeRange}
+              onChange={(e) => setFormData({ ...formData, timeRange: e.target.value })}
+              placeholder="e.g., 10am–2pm"
+              className="bg-[#f5f5f5] dark:bg-[#3c3c3c] text-[#101010] dark:text-white border-none rounded-none"
+            />
+          </div>
+
+          {/* Images */}
+          <div className="space-y-3">
+            <Label className="mb-2 text-[#101010] dark:text-gray-200 font-medium">Images (Optional)</Label>
+
+            <label
+              className="
+                flex flex-col items-center justify-center
+                w-full h-32 rounded-none border-2 border-dashed
+                border-[#cfcfcf] dark:border-[#3c3c3c]
+                bg-[#f5f5f5] dark:bg-[#3c3c3c]
+                cursor-pointer hover:bg-[#e5e5e5] dark:hover:bg-[#2c2c2c]
+              "
+            >
+              <Upload className="w-8 h-8 mb-2 text-gray-600 dark:text-gray-300" />
+              <p className="text-sm text-gray-600 dark:text-gray-300">Click to upload images</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
+              <input
+                type="file"
+                className="hidden"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+            </label>
+
+            {images.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-medium mb-2 text-[#101010] dark:text-gray-200">
+                  Selected Images ({images.length})
+                </p>
+                <div className="grid grid-cols-4 gap-3">
+                  {images.map((image, index) => (
+                    <div key={index} className="relative group">
+                      <div className="aspect-square w-full rounded-none border overflow-hidden bg-gray-100 border-[#e5e5e5] dark:border-[#3c3c3c]">
+                        <img
+                          src={URL.createObjectURL(image)}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="space-x-2">
             <Button
               type="button"
               variant="outline"
+              className="border border-[#cfcfcf] dark:border-[#3c3c3c] rounded-none"
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
@@ -199,7 +205,7 @@ export default function CreateWork({ taskId, open, onOpenChange, onSuccess }: Cr
             </Button>
             <Button
               type="submit"
-              className="bg-[#2b564e] hover:bg-[#2b564e]/90 text-white"
+              className="bg-[#2b564e] hover:bg-[#244742] text-white rounded-none"
               disabled={loading}
             >
               {loading ? 'Creating...' : 'Create Work'}

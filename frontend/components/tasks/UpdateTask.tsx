@@ -103,7 +103,7 @@ export default function UpdateTask({ task, open, onOpenChange, onSuccess }: Upda
       toast.success("Task updated successfully");
       onSuccess();
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast.error("Failed to update task");
     } finally {
       setLoading(false);
@@ -112,34 +112,37 @@ export default function UpdateTask({ task, open, onOpenChange, onSuccess }: Upda
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
+      <DialogContent
         className="
           sm:max-w-[600px]
-          bg-white dark:bg-gray-900
+          bg-white dark:bg-[#101010]
           max-h-[90vh]
           h-full
           overflow-y-auto
           rounded-none
-          sm:rounded-lg
+          border border-[#cfcfcf] dark:border-[#3c3c3c]
         "
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Update Task
           </DialogTitle>
         </DialogHeader>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
+            {/* Title */}
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Title</FormLabel>
+                <FormItem className="mb-2">
+                  <FormLabel className="text-gray-700 dark:text-gray-300 mb-2">Title</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter task title"
-                      className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700"
+                      className="bg-white dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none text-[#101010] dark:text-white"
                       {...field}
                     />
                   </FormControl>
@@ -148,16 +151,17 @@ export default function UpdateTask({ task, open, onOpenChange, onSuccess }: Upda
               )}
             />
 
+            {/* Description */}
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Description</FormLabel>
+                <FormItem className="mb-2">
+                  <FormLabel className="text-gray-700 dark:text-gray-300 mb-2">Description</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Enter task description"
-                      className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 min-h-[100px]"
+                      className="bg-white dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] min-h-[100px] rounded-none text-[#101010] dark:text-white"
                       {...field}
                     />
                   </FormControl>
@@ -166,42 +170,43 @@ export default function UpdateTask({ task, open, onOpenChange, onSuccess }: Upda
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-300">Status</FormLabel>
+            {/* Status */}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem className="mb-2">
+                  <FormLabel className="text-gray-700 dark:text-gray-300 mb-2">Status</FormLabel>
+                  <FormControl>
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
+                      <SelectTrigger className="bg-white dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-none bg-white dark:bg-[#101010]">
                         <SelectItem value="pending">Pending</SelectItem>
                         <SelectItem value="in_progress">In Progress</SelectItem>
                         <SelectItem value="completed">Completed</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
+            {/* Assigned Users */}
             <FormField
               control={form.control}
               name="assignedUsers"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-700 dark:text-gray-300">Assign To</FormLabel>
+                <FormItem className="mb-2">
+                  <FormLabel className="text-gray-700 dark:text-gray-300 mb-2">Assign To</FormLabel>
                   <FormControl>
                     <UserSelect
                       value={field.value}
                       onChange={field.onChange}
                       placeholder="Select users to assign..."
+                     
                     />
                   </FormControl>
                   <FormMessage />
@@ -209,21 +214,22 @@ export default function UpdateTask({ task, open, onOpenChange, onSuccess }: Upda
               )}
             />
 
+            {/* Start & Deadline */}
             <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="startDate"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel className="text-gray-700 dark:text-gray-300">Start Date</FormLabel>
+                  <FormItem className="mb-2 flex flex-col">
+                    <FormLabel className="text-gray-700 dark:text-gray-300 mb-2">Start Date</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                              !field.value && "text-muted-foreground"
+                              "w-full pl-3 text-left font-normal bg-white dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none",
+                              !field.value && "text-gray-500 dark:text-gray-400"
                             )}
                           >
                             {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
@@ -231,7 +237,7 @@ export default function UpdateTask({ task, open, onOpenChange, onSuccess }: Upda
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 rounded-none bg-white dark:bg-[#101010]" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -249,16 +255,16 @@ export default function UpdateTask({ task, open, onOpenChange, onSuccess }: Upda
                 control={form.control}
                 name="deadline"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel className="text-gray-700 dark:text-gray-300">Deadline</FormLabel>
+                  <FormItem className="mb-2 flex flex-col">
+                    <FormLabel className="text-gray-700 dark:text-gray-300 mb-2">Deadline</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700",
-                              !field.value && "text-muted-foreground"
+                              "w-full pl-3 text-left font-normal bg-white dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none",
+                              !field.value && "text-gray-500 dark:text-gray-400"
                             )}
                           >
                             {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
@@ -266,7 +272,7 @@ export default function UpdateTask({ task, open, onOpenChange, onSuccess }: Upda
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 rounded-none bg-white dark:bg-[#101010]" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -281,23 +287,25 @@ export default function UpdateTask({ task, open, onOpenChange, onSuccess }: Upda
               />
             </div>
 
+            {/* Buttons */}
             <div className="flex justify-end space-x-2 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                className="border-gray-300 dark:border-gray-700"
+                className="border border-[#cfcfcf] dark:border-[#101010] rounded-none"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={loading}
-                className="bg-[#2b564e] hover:bg-[#2b564e]/90 text-white"
+                className="bg-[#2b564e] hover:bg-[#244742] text-white rounded-none"
               >
                 {loading ? 'Updating...' : 'Update Task'}
               </Button>
             </div>
+
           </form>
         </Form>
       </DialogContent>

@@ -92,7 +92,7 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
 
   return (
     <>
-      <div className="border rounded-lg bg-white dark:bg-gray-900 p-4 shadow-sm hover:shadow-md transition-shadow">
+      <div className="border bg-white dark:bg-[#101010] p-4 shadow-sm hover:shadow-md transition-shadow">
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
@@ -137,7 +137,7 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
         {/* Description */}
         {work.description && (
           <div className="mb-4">
-            <div className="text-sm text-gray-500 dark:text-gray-300 mb-2 border p-2 rounded-md">
+            <div className="text-sm text-gray-600 dark:text-gray-300 mb-2 border p-2">
               {work.description}
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
                       if (parent) {
                         parent.innerHTML = `
                           <div class="h-full w-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-                            <User className="h-4 w-4 text-gray-500" />
+                            <User className="h-4 w-4 text-gray-600" />
                           </div>
                         `;
                       }
@@ -168,11 +168,11 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
                 </div>
               ) : (
                 <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                  <User className="h-4 w-4 text-gray-500" />
+                  <User className="h-4 w-4 text-gray-600" />
                 </div>
               )}
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Worked By</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Worked By</p>
                 <p className="text-sm font-medium truncate">{work.createdBy.name}</p>
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
             <div className="flex items-start gap-2">
               <Clock className="h-4 w-4 text-gray-400" />
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Time Range</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Time Range</p>
                 <p className="text-sm font-medium">{work.timeRange}</p>
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
               </Button>
             </DialogTitle>
           </DialogHeader>
-          <div className="relative h-[70vh] w-full flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+          <div className="relative h-[70vh] w-full flex items-center justify-center bg-gray-100 dark:bg-[#101010] p-4">
             {selectedImage && !imageLoadError ? (
               <img 
                 src={selectedImage} 
@@ -260,7 +260,7 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
             ) : (
               <div className="flex flex-col items-center justify-center text-center p-8">
                 <ImageIcon className="h-16 w-16 text-gray-400 mb-4" />
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-gray-600 dark:text-gray-400">
                   Failed to load image
                 </p>
                 <Button
@@ -274,7 +274,7 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
             )}
           </div>
           <div className="px-6 pb-6 pt-4 border-t">
-            <div className="text-sm text-gray-500 flex items-center justify-between">
+            <div className="text-sm text-gray-600 flex items-center justify-between">
               <span>Click image to open in new tab</span>
               <Button
                 variant="ghost"

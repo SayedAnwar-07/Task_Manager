@@ -1,42 +1,20 @@
 "use client";
 
+import { useAuth } from "@/app/providers/AuthProvider";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn, loading } = useAuth();
   const router = useRouter();
-  const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
-    // Only run on client
-    const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
-
-    if (!token || !user) {
-      router.replace("/login");
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(user);
-      if (!parsed?.email) {
-        throw new Error("Invalid user");
-      }
-      setAllowed(true);
-    } catch {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+    if (!loading && !isLoggedIn) {
       router.replace("/login");
     }
-  }, [router]);
+  }, [loading, isLoggedIn, router]);
 
-  if (!allowed) {
-    return (
-      <div className="w-full text-center text-slate-400 mt-10">
-        Checking authentication...
-      </div>
-    );
-  }
+  if (loading) return <p className="text-slate-400 text-sm">Checking session...</p>;
 
   return <>{children}</>;
 }

@@ -53,10 +53,12 @@ const createWork = async (req, res) => {
 // @route GET /api/tasks/:taskId/works
 // @access Private
 const getWorksByTask = async (req, res) => {
-  const { taskId } = req.params;
+  const taskId = req.params.taskId;
+  console.log("Task ID:", taskId);
+  if (!taskId) return res.status(400).json({ message: "Task ID is required" });
 
   const works = await Work.find({ task: taskId })
-    .populate("createdBy", "name email")
+    .populate("createdBy", "name email display_image")
     .populate("task", "title");
   res.json(works);
 };
@@ -66,7 +68,7 @@ const getWorksByTask = async (req, res) => {
 // @access Private
 const getWorkById = async (req, res) => {
   const work = await Work.findById(req.params.id)
-    .populate("createdBy", "name email")
+    .populate("createdBy", "name email display_image")
     .populate("task", "title");
   if (!work) return res.status(404).json({ message: "Work not found" });
   res.json(work);
@@ -93,12 +95,23 @@ const updateWork = async (req, res) => {
   if (timeRange !== undefined) work.timeRange = timeRange;
 
   // remove selected images
-  if (removeImagePublicIds && Array.isArray(removeImagePublicIds)) {
-    for (const publicId of removeImagePublicIds) {
+  let removeIds = [];
+  if (removeImagePublicIds) {
+    try {
+      removeIds = JSON.parse(removeImagePublicIds);
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ message: "Invalid removeImagePublicIds format" });
+    }
+  }
+
+  if (removeIds.length > 0) {
+    for (const publicId of removeIds) {
       await cloudinary.uploader.destroy(publicId);
     }
     work.images = work.images.filter(
-      (img) => !removeImagePublicIds.includes(img.publicId)
+      (img) => !removeIds.includes(img.publicId)
     );
   }
 

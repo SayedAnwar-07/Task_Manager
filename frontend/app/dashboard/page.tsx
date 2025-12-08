@@ -1,14 +1,17 @@
-import Sidebar from "@/components/sidebar";
+"use client";
+
+import AuthGuard from "@/components/auth-guard";
+import Tasks from "@/components/tasks/Tasks";
 
 export default function DashboardPage() {
-  return (
-    <div className="flex">
-      <Sidebar />
 
-      <main className="flex-1 p-6">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p>Welcome to your task manager!</p>
-      </main>
-    </div>
+  return (
+    <section>
+      <AuthGuard>
+        <div className="max-w-6xl mx-auto min-h-screen">
+          <Tasks />
+        </div>
+      </AuthGuard>
+    </section>
   );
 }

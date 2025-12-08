@@ -1,53 +1,57 @@
 import "./globals.css";
-import type { ReactNode } from "react";
+import { ReactNode } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
+import { AuthProvider } from "./providers/AuthProvider";import Navbar from "@/components/shared/Navbar";
+import { Toaster } from "sonner";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata = {
   title: "Task Manager",
   description: "Team-based task manager",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/logo.png", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-slate-950 text-slate-100">
-        <ThemeProvider>
-          <div className="flex min-h-screen flex-col">
-            <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-              <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-                <Link href="/tasks" className="font-semibold text-sky-400">
-                  Task Manager
-                </Link>
-                <div className="flex items-center gap-3">
-                  <Link
-                    href="/tasks"
-                    className="text-sm text-slate-300 hover:text-white"
-                  >
-                    Tasks
+      <body className="min-h-screen">
+        <AuthProvider>
+          <ThemeProvider>
+            <div className="flex min-h-screen flex-col">
+              <header className="border-b">
+                <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
+                  <Link href="/" className="font-semibold flex gap-2 items-center">
+                    <img src="https://i.ibb.co.com/ds9rs0YX/image-removebg-preview.png" alt="logo" className="w-10 h-10"/>
+                    <div className="font-light text-sm">
+                      <p className="font-semibold">Eentra <span className="dark:text-[#e44332] text-[#2b564e] font-bold">BD</span></p>
+                      <p>Task Manager</p>
+                    </div>
                   </Link>
-                  <Link
-                    href="/login"
-                    className="text-sm text-slate-300 hover:text-white"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="text-sm text-slate-300 hover:text-white"
-                  >
-                    Register
-                  </Link>
-                  <ThemeToggle />
+
+                  {/* CLIENT COMPONENT CAN USE useAuth() */}
+                  <div className="flex gap-3">
+                    <ThemeToggle />
+                    <Navbar />
+                  </div>
                 </div>
-              </div>
-            </header>
-            <main className="mx-auto flex w-full max-w-5xl flex-1 px-4 py-6">
-              {children}
-            </main>
-          </div>
-        </ThemeProvider>
+              </header>
+
+              <main className="max-w-6xl mx-auto w-full px-4 py-6">
+                {children}
+                <Toaster />
+              </main>
+            </div>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

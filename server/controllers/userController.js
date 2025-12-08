@@ -25,6 +25,7 @@ const registerUser = async (req, res) => {
 
   res.status(201).json({
     _id: user._id,
+    display_image: user.display_image || null,
     name: user.name,
     email: user.email,
     token: generateToken(user._id),
@@ -41,6 +42,7 @@ const authUser = async (req, res) => {
   if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
+      display_image: user.display_image,
       name: user.name,
       email: user.email,
       token: generateToken(user._id),
@@ -90,6 +92,7 @@ const updateUser = async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) return res.status(404).json({ message: "User not found" });
 
+  user.display_image = req.body.display_image || user.display_image;
   user.name = req.body.name || user.name;
   user.email = req.body.email || user.email;
 
@@ -101,6 +104,7 @@ const updateUser = async (req, res) => {
   const updatedUser = await user.save();
   res.json({
     _id: updatedUser._id,
+    display_image: updatedUser.display_image,
     name: updatedUser.name,
     email: updatedUser.email,
   });

@@ -31,8 +31,8 @@ const createTask = async (req, res) => {
 // @access Private
 const getTasks = async (req, res) => {
   const tasks = await Task.find()
-    .populate("createdBy", "name email")
-    .populate("assignedUsers", "name email");
+    .populate("createdBy", "name email display_image")
+    .populate("assignedUsers", "name email display_image");
   res.json(tasks);
 };
 
@@ -41,8 +41,8 @@ const getTasks = async (req, res) => {
 // @access Private
 const getTaskById = async (req, res) => {
   const task = await Task.findById(req.params.id)
-    .populate("createdBy", "name email")
-    .populate("assignedUsers", "name email");
+    .populate("createdBy", "name email display_image")
+    .populate("assignedUsers", "name email display_image");
 
   if (!task) return res.status(404).json({ message: "Task not found" });
   res.json(task);

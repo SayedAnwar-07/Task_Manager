@@ -7,20 +7,25 @@ export function getAuthToken() {
   return localStorage.getItem("token");
 }
 
-export async function apiFetch(
+export async function apiFetch<T = any>(
   path: string,
   options: RequestInit = {}
-): Promise<any> {
+): Promise<T> {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  const headers: Record<string, string> = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options.headers as Record<string, string>),
+  };
+
+  // Assign Content-Type only when NOT FormData
+  if (!(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
 
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
-    headers: {
-      "Content-Type":
-        options.body instanceof FormData ? undefined : "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
+    headers,
   });
 
   if (!res.ok) {
@@ -28,5 +33,6 @@ export async function apiFetch(
     throw new Error(errorData.message || `Request failed: ${res.status}`);
   }
 
-  return res.json();
+  return res.json() as Promise<T>;
 }
+

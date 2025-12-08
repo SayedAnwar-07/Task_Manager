@@ -50,7 +50,7 @@ export default function LoginPage() {
         localStorage.setItem(
           "user",
           JSON.stringify({
-            id: data._id,
+            _id: data._id ?? data.id,
             name: data.name,
             email: data.email,
             display_image: data.display_image || null,

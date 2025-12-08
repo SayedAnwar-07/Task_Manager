@@ -112,7 +112,17 @@ export default function UpdateTask({ task, open, onOpenChange, onSuccess }: Upda
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-white dark:bg-gray-900">
+      <DialogContent 
+        className="
+          sm:max-w-[600px]
+          bg-white dark:bg-gray-900
+          max-h-[90vh]
+          h-full
+          overflow-y-auto
+          rounded-none
+          sm:rounded-lg
+        "
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
             Update Task

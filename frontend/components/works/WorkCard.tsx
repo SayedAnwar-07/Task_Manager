@@ -25,19 +25,18 @@ import {
   Trash2,
   User,
   X,
-  AlertCircle,
   Image as ImageIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Separator } from '../ui/separator';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { format } from 'date-fns';
-import Image from 'next/image';
 
 interface WorkCardProps {
   work: Work;
   onEdit: (work: Work) => void;
   onDelete: (id: string) => Promise<void>;
+  isCreator: boolean; 
 }
 
 export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
@@ -48,8 +47,9 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
   const [imageLoadError, setImageLoadError] = useState(false);
 
   const { user } = useAuth();
-  const isCreator = user?.id === work.createdBy._id;
 
+  const isCreator = user?._id === work.createdBy._id;
+  console.log(work.createdBy)
   const formatDate = (dateString: string) =>
     format(new Date(dateString), 'dd MMM yyyy, hh:mm aa');
 

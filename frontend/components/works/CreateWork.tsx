@@ -81,7 +81,17 @@ export default function CreateWork({ taskId, open, onOpenChange, onSuccess }: Cr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent 
+        className="
+          sm:max-w-[600px]
+          bg-white dark:bg-gray-900
+          max-h-[90vh]
+          h-full
+          overflow-y-auto
+          rounded-none
+          sm:rounded-lg
+        "
+      >
         <DialogHeader>
           <DialogTitle>Add New Work</DialogTitle>
           <DialogDescription>

@@ -128,7 +128,17 @@ export default function UpdateWork({ work, open, onOpenChange, onSuccess }: Upda
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent 
+        className="
+          sm:max-w-[600px]
+          bg-white dark:bg-gray-900
+          max-h-[90vh]
+          h-full
+          overflow-y-auto
+          rounded-none
+          sm:rounded-lg
+        "
+      >
         <DialogHeader>
           <DialogTitle>Edit Work</DialogTitle>
           <DialogDescription>
@@ -292,7 +302,7 @@ export default function UpdateWork({ work, open, onOpenChange, onSuccess }: Upda
             </Button>
             <Button
               type="submit"
-              className="bg-[#2b564e] hover:bg-[#2b564e]/90"
+              className="bg-[#2b564e] hover:bg-[#2b564e]/90 text-white"
               disabled={loading}
             >
               {loading ? 'Updating...' : 'Update Work'}

@@ -206,9 +206,7 @@ export default function TaskDetailPage() {
        <Separator className="my-10" />
 
        <div>
-           <Works 
-              taskId={params.id}
-            />
+           <Works taskId={String(params.id)} />
        </div>
     </div>
   );

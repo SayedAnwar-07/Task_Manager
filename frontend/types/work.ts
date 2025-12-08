@@ -18,6 +18,7 @@ export interface Work {
     _id: string;
     name: string;
     email: string;
+    display_image?: string; 
   };
   createdAt: string;
   updatedAt: string;

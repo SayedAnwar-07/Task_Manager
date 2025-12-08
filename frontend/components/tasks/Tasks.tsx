@@ -35,6 +35,8 @@ export default function Tasks() {
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -58,19 +60,26 @@ export default function Tasks() {
     setIsDeleteAlertOpen(true);
   };
 
-  const handleDelete = async () => {
-    if (!taskToDelete) return;
+const handleDelete = async () => {
+  if (!taskToDelete) return;
 
-    try {
-      await taskApi.delete(taskToDelete);
-      setTasks(tasks.filter(task => task._id !== taskToDelete));
-      toast("Task deleted successfully");
-      setIsDeleteAlertOpen(false);
-      setTaskToDelete(null);
-    } catch (error) {
-      toast("Failed to delete task");
-    }
-  };
+  try {
+    setIsDeleting(true); 
+
+    await taskApi.delete(taskToDelete);
+
+    setTasks(tasks.filter(task => task._id !== taskToDelete));
+    toast("Task deleted successfully");
+
+    setIsDeleteAlertOpen(false);
+    setTaskToDelete(null);
+  } catch (error) {
+    toast("Failed to delete task");
+  } finally {
+    setIsDeleting(false); 
+  }
+};
+
 
   const cancelDelete = () => {
     setIsDeleteAlertOpen(false);
@@ -346,20 +355,49 @@ export default function Tasks() {
                 Are you sure you want to delete this task? This action cannot be undone.
               </p>
               <div className="flex justify-end space-x-3 mt-4">
-                <Button
+               <Button
                   variant="outline"
                   onClick={cancelDelete}
                   className="border-gray-300 hover:bg-gray-100"
+                  disabled={isDeleting} 
                 >
                   Cancel
                 </Button>
+
                 <Button
                   variant="destructive"
                   onClick={handleDelete}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+                  disabled={isDeleting} 
                 >
-                  Delete
+                  {isDeleting ? (
+                    <>
+                      <svg
+                        className="animate-spin h-4 w-4 text-white"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
+                      </svg>
+                      Deleting...
+                    </>
+                  ) : (
+                    "Delete"
+                  )}
                 </Button>
+
               </div>
             </AlertDescription>
           </Alert>

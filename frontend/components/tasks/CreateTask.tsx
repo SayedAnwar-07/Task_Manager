@@ -50,7 +50,17 @@ const formSchema = z.object({
   assignedUsers: z.array(z.string()).default([]),
 });
 
-type FormData = z.infer<typeof formSchema>;
+
+
+type FormData = {
+  title: string;
+  description?: string;
+  status: "pending" | "in_progress" | "completed";
+  startDate: Date;
+  deadline: Date;
+  assignedUsers: string[]; 
+};
+
 
 interface CreateTaskProps {
   open: boolean;
@@ -61,26 +71,30 @@ interface CreateTaskProps {
 export default function CreateTask({ open, onOpenChange, onSuccess }: CreateTaskProps) {
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<FormData>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      status: 'pending',
+      title: "",
+      description: "",
+      status: "pending",
       startDate: new Date(),
       deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       assignedUsers: [],
     },
   });
 
+
+
   const onSubmit = async (values: FormData) => {
     try {
       setLoading(true);
       const data = {
         ...values,
+        description: values.description ?? "",
         startDate: values.startDate.toISOString(),
         deadline: values.deadline.toISOString(),
       };
+
 
       await taskApi.create(data);
       toast.success("Task created successfully");
@@ -96,7 +110,17 @@ export default function CreateTask({ open, onOpenChange, onSuccess }: CreateTask
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-white dark:bg-gray-900">
+      <DialogContent 
+        className="
+          sm:max-w-[600px]
+          bg-white dark:bg-gray-900
+          max-h-[90vh]
+          h-full
+          overflow-y-auto
+          rounded-none
+          sm:rounded-lg
+        "
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
             Create New Task
@@ -173,7 +197,7 @@ export default function CreateTask({ open, onOpenChange, onSuccess }: CreateTask
                   <FormLabel className="text-gray-700 dark:text-gray-300">Assign To</FormLabel>
                   <FormControl>
                     <UserSelect
-                      value={field.value}
+                      value={field.value ?? []}
                       onChange={field.onChange}
                       placeholder="Select users to assign..."
                     />

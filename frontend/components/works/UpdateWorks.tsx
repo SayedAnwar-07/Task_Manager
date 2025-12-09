@@ -31,6 +31,7 @@ export default function UpdateWork({ work, open, onOpenChange, onSuccess }: Upda
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    shareUrl: '',
     timeRange: '',
   });
   const [images, setImages] = useState<File[]>([]);
@@ -43,6 +44,7 @@ export default function UpdateWork({ work, open, onOpenChange, onSuccess }: Upda
       setFormData({
         title: work.title,
         description: work.description || '',
+        shareUrl: work.shareUrl || '',
         timeRange: work.timeRange || '',
       });
       setImages([]);
@@ -155,6 +157,20 @@ export default function UpdateWork({ work, open, onOpenChange, onSuccess }: Upda
               placeholder="Describe your work..."
             />
           </div>
+
+          <div className="space-y-2">
+              <Label htmlFor="shareUrl" className="mb-2 text-[#101010] dark:text-gray-200 font-medium">
+                Share URL
+              </Label>
+              <Input
+                id="shareUrl"
+                value={formData.shareUrl}
+                onChange={(e) => setFormData({ ...formData, shareUrl: e.target.value })}
+                placeholder="Enter optional shareable URL"
+                className="bg-[#f5f5f5] dark:bg-[#3c3c3c] text-[#101010] dark:text-white border-none rounded-none"
+              />
+          </div>
+
 
           {/* TIME RANGE */}
           <div className="space-y-2">

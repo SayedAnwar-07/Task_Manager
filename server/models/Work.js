@@ -9,7 +9,8 @@ const workSchema = new mongoose.Schema(
     },
     title: { type: String, required: true },
     description: { type: String },
-    timeRange: { type: String }, 
+    timeRange: { type: String },
+    shareUrl: { type: String },
     images: [
       {
         url: { type: String, required: true },

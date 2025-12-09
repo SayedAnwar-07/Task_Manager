@@ -19,7 +19,7 @@ const uploadFromBuffer = (file) => {
 // @route POST /api/tasks/:taskId/works
 // @access Private
 const createWork = async (req, res) => {
-  const { title, description, timeRange } = req.body;
+  const { title, description, timeRange, shareUrl } = req.body;
   const { taskId } = req.params;
 
   if (!title) {
@@ -42,6 +42,7 @@ const createWork = async (req, res) => {
     title,
     description,
     timeRange,
+    shareUrl,
     images,
     createdBy: req.user._id,
   });
@@ -88,11 +89,13 @@ const updateWork = async (req, res) => {
       .json({ message: "Only the creator can update this work" });
   }
 
-  const { title, description, timeRange, removeImagePublicIds } = req.body;
+  const { title, description, timeRange, shareUrl, removeImagePublicIds } =
+    req.body;
 
   if (title !== undefined) work.title = title;
   if (description !== undefined) work.description = description;
   if (timeRange !== undefined) work.timeRange = timeRange;
+  if (shareUrl !== undefined) work.shareUrl = shareUrl;
 
   // remove selected images
   let removeIds = [];

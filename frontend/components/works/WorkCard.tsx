@@ -26,6 +26,7 @@ import {
   User,
   X,
   Image as ImageIcon,
+  Copy,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Separator } from '../ui/separator';
@@ -49,7 +50,6 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
   const { user } = useAuth();
 
   const isCreator = user?._id === work.createdBy._id;
-  console.log(work.createdBy)
   const formatDate = (dateString: string) =>
     format(new Date(dateString), 'dd MMM yyyy, hh:mm aa');
 
@@ -189,6 +189,33 @@ export default function WorkCard({ work, onEdit, onDelete }: WorkCardProps) {
             </div>
           )}
         </div>
+
+        {/* Share URL */}
+        {work.shareUrl && (
+          <div className="mt-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Share URL:</p>
+
+            <div className="flex gap-2">
+              <span className="text-sm break-all text-blue-600 dark:text-blue-400  p-2 border">
+                {work.shareUrl}
+              </span>
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="p-2 rounded-none cursor-pointer"
+                onClick={() => {
+                  navigator.clipboard.writeText(work.shareUrl!);
+                  toast.success("Copied!");
+                }}
+              >
+                <Copy />
+              </Button>
+            </div>
+          </div>
+        )}
+
+
 
         {/* Images Preview */}
         {work.images && work.images.length > 0 && (

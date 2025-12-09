@@ -29,6 +29,7 @@ export default function CreateWork({ taskId, open, onOpenChange, onSuccess }: Cr
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    shareUrl: '',
     timeRange: '',
   });
   const [images, setImages] = useState<File[]>([]);
@@ -70,7 +71,7 @@ export default function CreateWork({ taskId, open, onOpenChange, onSuccess }: Cr
   };
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', timeRange: '' });
+    setFormData({ title: '', description: '', timeRange: '', shareUrl: '' });
     setImages([]);
   };
 
@@ -121,6 +122,20 @@ export default function CreateWork({ taskId, open, onOpenChange, onSuccess }: Cr
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Describe your work..."
               rows={4}
+              className="bg-[#f5f5f5] dark:bg-[#3c3c3c] text-[#101010] dark:text-white border-none rounded-none"
+            />
+          </div>
+
+          {/* share url */}
+          <div className="space-y-2">
+            <Label htmlFor="shareUrl" className="mb-2 text-[#101010] dark:text-gray-200 font-medium">
+              Share URL
+            </Label>
+            <Input
+              id="shareUrl"
+              value={formData.shareUrl}
+              onChange={(e) => setFormData({ ...formData, shareUrl: e.target.value })}
+              placeholder="Enter optional shareable URL"
               className="bg-[#f5f5f5] dark:bg-[#3c3c3c] text-[#101010] dark:text-white border-none rounded-none"
             />
           </div>

@@ -13,6 +13,7 @@ export interface Work {
   title: string;
   description?: string;
   timeRange?: string;
+  shareUrl?: string; 
   images: WorkImage[];
   createdBy: {
     _id: string;
@@ -28,6 +29,7 @@ export interface CreateWorkData {
   title: string;
   description?: string;
   timeRange?: string;
+  shareUrl?: string; 
   images?: File[];
 }
 

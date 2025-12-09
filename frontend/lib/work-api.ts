@@ -1,6 +1,7 @@
 import { Work, CreateWorkData, UpdateWorkData } from '@/types/work';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://task-manager-two-mu-42.vercel.app/api';
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const workApi = {
   getByTaskId: async (taskId: string): Promise<Work[]> => {
@@ -29,6 +30,7 @@ export const workApi = {
     const formData = new FormData();
     formData.append('title', data.title);
     if (data.description) formData.append('description', data.description);
+    if (data.shareUrl) formData.append("shareUrl", data.shareUrl);
     if (data.timeRange) formData.append('timeRange', data.timeRange);
     
     if (data.images) {
@@ -53,11 +55,12 @@ export const workApi = {
     const formData = new FormData();
     if (data.title) formData.append('title', data.title);
     if (data.description !== undefined) formData.append('description', data.description || '');
+    if (data.shareUrl !== undefined)formData.append("shareUrl", data.shareUrl);
     if (data.timeRange) formData.append('timeRange', data.timeRange);
     
     if (data.removeImagePublicIds) {
       formData.append('removeImagePublicIds', JSON.stringify(data.removeImagePublicIds));
-    }
+    } 
     
     if (data.images) {
       data.images.forEach((image) => {

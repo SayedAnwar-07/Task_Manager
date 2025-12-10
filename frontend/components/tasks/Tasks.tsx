@@ -26,6 +26,8 @@ import { MoreHorizontal, Plus, Eye, Edit, Trash2, Calendar, Users } from 'lucide
 import CreateTask from './CreateTask';
 import UpdateTask from './UpdateTask';
 import { toast } from 'sonner';
+import LiquidLoader from '../shared/LiquidLoader';
+import TaskFilters from './TaskFilters';
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -36,17 +38,23 @@ export default function Tasks() {
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState<'pending' | 'in_progress' | 'done' | ''>('');
 
   const router = useRouter();
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    fetchTasks(); 
+  },[search, filterStatus]);
 
-  const fetchTasks = async () => {
+
+  const fetchTasks = async (searchValue?: string, statusValue?: 'pending' | 'in_progress' | 'done' | '') => {
     try {
       setLoading(true);
-      const data = await taskApi.getAll();
+      const data = await taskApi.getAll({
+        search: searchValue !== undefined ? searchValue : search,
+        status: statusValue !== undefined ? statusValue || undefined : filterStatus || undefined,
+      });
       setTasks(data);
     } catch (error) {
       toast("Failed to fetch tasks");
@@ -55,31 +63,46 @@ export default function Tasks() {
     }
   };
 
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+  };
+
+  const handleStatusChange = (status: 'pending' | 'in_progress' | 'done' | '') => {
+    setFilterStatus(status);
+  };
+
+  const handleApplyFilters = () => {
+    fetchTasks();
+  };
+
+  const handleClearFilters = () => {
+    setSearch('');
+    setFilterStatus('');
+    fetchTasks();
+  };
+
   const openDeleteAlert = (id: string) => {
     setTaskToDelete(id);
     setIsDeleteAlertOpen(true);
   };
 
-const handleDelete = async () => {
-  if (!taskToDelete) return;
+  const handleDelete = async () => {
+    if (!taskToDelete) return;
 
-  try {
-    setIsDeleting(true); 
-
-    await taskApi.delete(taskToDelete);
-
-    setTasks(tasks.filter(task => task._id !== taskToDelete));
-    toast("Task deleted successfully");
-
-    setIsDeleteAlertOpen(false);
-    setTaskToDelete(null);
-  } catch (error) {
-    toast("Failed to delete task");
-  } finally {
-    setIsDeleting(false); 
-  }
-};
-
+    try {
+      setIsDeleting(true);
+      await taskApi.delete(taskToDelete);
+      setTasks(tasks.filter(task => task._id !== taskToDelete));
+      toast("Task deleted successfully");
+      setIsDeleteAlertOpen(false);
+      setTaskToDelete(null);
+    } catch (error) {
+      toast("Failed to delete task");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const cancelDelete = () => {
     setIsDeleteAlertOpen(false);
@@ -88,7 +111,7 @@ const handleDelete = async () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'done':
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
       case 'in_progress':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
@@ -113,11 +136,12 @@ const handleDelete = async () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100"></div>
+      <div className="flex justify-center items-center h-screen">
+        <LiquidLoader size="md" showText={true} speed={1.5} />
       </div>
     );
   }
+
 
   return (
     <div className="max-w-6xl mx-auto lg:p-6">
@@ -137,6 +161,16 @@ const handleDelete = async () => {
           Create Task
         </Button>
       </div>
+
+      {/* Use the TaskFilters component */}
+      <TaskFilters
+        search={search}
+        filterStatus={filterStatus}
+        onSearchChange={handleSearchChange}
+        onStatusChange={handleStatusChange}
+        onApplyFilters={handleApplyFilters}
+        onClearFilters={handleClearFilters}
+      />
 
       {/* Desktop Table View */}
       <div className="hidden lg:block border bg-white dark:bg-[#101010]">
@@ -280,7 +314,7 @@ const handleDelete = async () => {
             <div className="flex flex-wrap justify-between gap-3 mb-4">
               <div className="flex items-start gap-2">
                 <div className={`w-3 h-3 rounded-full ${
-                  task.status === 'completed' ? 'bg-green-500' :
+                  task.status === 'done' ? 'bg-green-500' :
                   task.status === 'in_progress' ? 'bg-blue-500' :
                   'bg-yellow-500'
                 }`}></div>

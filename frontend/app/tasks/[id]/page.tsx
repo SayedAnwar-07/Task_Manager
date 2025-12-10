@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import Works from '@/components/works/Works';
 import SafeImage from '@/components/SafeImage';
+import LiquidLoader from '@/components/shared/LiquidLoader';
 
 
 export default function TaskDetailPage() {
@@ -39,7 +40,7 @@ export default function TaskDetailPage() {
 
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'completed':
+      case 'done':
         return {
           color: 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300',
           icon: CheckCircle,
@@ -65,7 +66,7 @@ export default function TaskDetailPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-gray-900 dark:border-gray-600 dark:border-t-gray-100"></div>
+         <LiquidLoader size="md" showText={true} speed={1.5} />
       </div>
     );
   }

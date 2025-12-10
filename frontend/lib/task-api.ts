@@ -3,8 +3,15 @@ import { apiFetch } from './api';
 
 export const taskApi = {
   // Get all tasks
-  getAll: async (): Promise<Task[]> => {
-    return apiFetch('/api/tasks');
+  getAll: async (params?: { search?: string; status?: string }): Promise<Task[]> => {
+    let query = '';
+    if (params) {
+      const queryParams = new URLSearchParams();
+      if (params.search) queryParams.append('search', params.search);
+      if (params.status) queryParams.append('status', params.status);
+      query = `?${queryParams.toString()}`;
+    }
+    return apiFetch(`/api/tasks${query}`);
   },
 
   // Get single task

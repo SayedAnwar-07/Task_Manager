@@ -26,14 +26,32 @@ const createTask = async (req, res) => {
   res.status(201).json(task);
 };
 
-// @desc Get all tasks
+// @desc Get all tasks with search and filter
 // @route GET /api/tasks
 // @access Private
 const getTasks = async (req, res) => {
-  const tasks = await Task.find()
-    .populate("createdBy", "name email display_image")
-    .populate("assignedUsers", "name email display_image");
-  res.json(tasks);
+  try {
+    const { search, status } = req.query;
+
+    let query = {};
+
+    if (search) {
+      query.title = { $regex: search, $options: "i" };
+    }
+
+    if (status) {
+      query.status = status;
+    }
+
+    const tasks = await Task.find(query)
+      .populate("createdBy", "name email display_image")
+      .populate("assignedUsers", "name email display_image");
+
+    res.json(tasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 // @desc Get single task

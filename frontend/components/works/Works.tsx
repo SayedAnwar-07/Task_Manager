@@ -10,6 +10,7 @@ import WorkCard from './WorkCard';
 import CreateWork from './CreateWork';
 import UpdateWork from './UpdateWorks';
 import { useAuth } from '@/app/providers/AuthProvider';
+import LiquidLoader from '../shared/LiquidLoader';
 
 interface WorksProps {
   taskId: string;
@@ -58,7 +59,7 @@ export default function Works({ taskId, taskTitle }: WorksProps) {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100"></div>
+         <LiquidLoader size="md" showText={true} speed={1.5} />
       </div>
     );
   }

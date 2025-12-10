@@ -26,14 +26,17 @@ const createTask = async (req, res) => {
   res.status(201).json(task);
 };
 
-// @desc Get all tasks with search and filter
+// @desc Get all tasks for logged-in user (created or assigned)
 // @route GET /api/tasks
 // @access Private
 const getTasks = async (req, res) => {
   try {
     const { search, status } = req.query;
 
-    let query = {};
+    // Base: user created OR assigned
+    let query = {
+      $or: [{ createdBy: req.user._id }, { assignedUsers: req.user._id }],
+    };
 
     if (search) {
       query.title = { $regex: search, $options: "i" };
@@ -45,7 +48,8 @@ const getTasks = async (req, res) => {
 
     const tasks = await Task.find(query)
       .populate("createdBy", "name email display_image")
-      .populate("assignedUsers", "name email display_image");
+      .populate("assignedUsers", "name email display_image")
+      .sort({ createdAt: -1 });
 
     res.json(tasks);
   } catch (error) {

@@ -70,7 +70,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center mt-20 md:mt-40">
+    <div className="flex items-center justify-center mt-20 md:mt-40 ">
       <div className="w-full max-w-md">
         {/* Header Section */}
         <div className="text-center mb-8">
@@ -80,7 +80,7 @@ export default function LoginPage() {
         </div>
 
         {/* Form Card */}
-        <div className="border-slate-200 dark:border-slate-700 border">
+        <div className="border-slate-200 dark:border-slate-700 border bg-white dark:bg-[#101010]">
           <form onSubmit={handleSubmit} className="p-8">
             {error && (
               <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 text-sm flex items-center">
@@ -101,7 +101,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="borderborder-slate-200 dark:border-slate-700 bg-white rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm"
+                  className="border border-slate-200 dark:border-slate-700 bg-gray-50 rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm"
                 />
               </div>
 
@@ -118,7 +118,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="borderborder-slate-200 dark:border-slate-700 bg-white rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm pr-10"
+                    className="border border-slate-200 dark:border-slate-700 bg-gray-50 rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm pr-10"
                   />
 
                   <button

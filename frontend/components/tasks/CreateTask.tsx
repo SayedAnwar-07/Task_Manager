@@ -133,7 +133,7 @@ export default function CreateTask({ open, onOpenChange, onSuccess }: CreateTask
                   <FormControl>
                     <Input
                       placeholder="Enter task title"
-                      className="bg-white dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none text-[#101010] dark:text-white"
+                      className="bg-gray-50 dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none text-[#101010] dark:text-white"
                       {...field}
                     />
                   </FormControl>
@@ -152,7 +152,7 @@ export default function CreateTask({ open, onOpenChange, onSuccess }: CreateTask
                   <FormControl>
                     <Textarea
                       placeholder="Enter task description"
-                      className="bg-white dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] min-h-[100px] rounded-none text-[#101010] dark:text-white"
+                      className="bg-gray-50 dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] min-h-[100px] rounded-none text-[#101010] dark:text-white"
                       {...field}
                     />
                   </FormControl>
@@ -170,7 +170,7 @@ export default function CreateTask({ open, onOpenChange, onSuccess }: CreateTask
                   <FormLabel className="text-gray-700 dark:text-gray-300 mb-2">Status</FormLabel>
                   <FormControl>
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="bg-white dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none">
+                      <SelectTrigger className="bg-gray-50 dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none">
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent className="rounded-none bg-white dark:bg-[#101010]">
@@ -191,7 +191,7 @@ export default function CreateTask({ open, onOpenChange, onSuccess }: CreateTask
               name="assignedUsers"
               render={({ field }) => (
                 <FormItem className="mb-2">
-                  <FormLabel className="text-gray-700 dark:text-gray-300 mb-2">Assign To</FormLabel>
+                  <FormLabel className="text-gray-700 dark:text-gray-300 mb-2 ">Assign To</FormLabel>
                   <FormControl>
                     <UserSelect
                       value={field.value ?? []}
@@ -218,7 +218,7 @@ export default function CreateTask({ open, onOpenChange, onSuccess }: CreateTask
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal bg-white dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none",
+                              "w-full pl-3 text-left font-normal bg-gray-50 dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none",
                               !field.value && "text-gray-500 dark:text-gray-400"
                             )}
                           >
@@ -227,7 +227,7 @@ export default function CreateTask({ open, onOpenChange, onSuccess }: CreateTask
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 rounded-none bg-white dark:bg-[#101010]" align="start">
+                      <PopoverContent className="w-auto p-0 rounded-none bg-gray-50 dark:bg-[#101010]" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -254,7 +254,7 @@ export default function CreateTask({ open, onOpenChange, onSuccess }: CreateTask
                           <Button
                             variant="outline"
                             className={cn(
-                              "w-full pl-3 text-left font-normal bg-white dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none",
+                              "w-full pl-3 text-left font-normal bg-gray-50 dark:bg-[#3c3c3c] border border-[#cfcfcf] dark:border-[#101010] rounded-none",
                               !field.value && "text-gray-500 dark:text-gray-400"
                             )}
                           >

@@ -58,7 +58,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Form Card */}
-        <div className="border-slate-200 dark:border-slate-700 border">
+        <div className="border-slate-200 dark:border-slate-700 border dark:bg-[#101010] bg-white">
           <form onSubmit={handleSubmit} className="p-8">
             {error && (
               <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 text-sm flex items-center">
@@ -87,7 +87,7 @@ export default function RegisterPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="John Doe"
-                  className="border border-slate-200 dark:border-slate-700 bg-white rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm"
+                  className="border border-slate-200 dark:border-slate-700 rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm bg-gray-50"
                 />
               </div>
 
@@ -100,7 +100,7 @@ export default function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="border border-slate-200 dark:border-slate-700 bg-white rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm"
+                  className="border border-slate-200 dark:border-slate-700 rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm bg-gray-50"
                 />
               </div>
 
@@ -116,7 +116,7 @@ export default function RegisterPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Create a strong password"
-                      className="borderborder-slate-200 dark:border-slate-700 bg-white rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm pr-10"
+                      className="border border-slate-200 dark:border-slate-700 bg-gray-50 rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm pr-10"
                     />
 
                     <button

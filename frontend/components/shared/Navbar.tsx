@@ -13,6 +13,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import SafeImage from "../SafeImage";
 import { Menu, Home, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { NotificationsBell } from "../NotificationsBell";
 
 export default function Navbar() {
   const { user, isLoggedIn, logout } = useAuth();
@@ -23,6 +24,7 @@ export default function Navbar() {
 
   return (
     <div className="flex items-center gap-4">
+      <NotificationsBell />
       {/* Desktop Links */}
       <div className="hidden md:flex items-center gap-3">
         {!isLoggedIn ? (

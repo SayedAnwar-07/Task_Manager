@@ -35,6 +35,7 @@ app.use("/api/auth", require("../routes/authRoutes"));
 app.use("/api/users", require("../routes/userRoutes"));
 app.use("/api/tasks", require("../routes/taskRoutes"));
 app.use("/api", require("../routes/workRoutes"));
+app.use("/api/notifications", require("../routes/notificationsRoutes"));
 
 app.use(notFound);
 app.use(errorHandler);

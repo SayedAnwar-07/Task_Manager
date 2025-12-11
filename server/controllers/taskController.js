@@ -2,6 +2,7 @@ const Task = require("../models/Task");
 const Work = require("../models/Work");
 const cloudinary = require("../config/cloudinary");
 const mongoose = require("mongoose");
+const { createNotification } = require("../utils/notifications");
 
 // @desc Create task
 // @route POST /api/tasks
@@ -23,6 +24,16 @@ const createTask = async (req, res) => {
     assignedUsers: assignedUsers || [],
     createdBy: req.user._id,
   });
+
+  // Notify assigned users
+  if (assignedUsers && assignedUsers.length > 0) {
+    await createNotification({
+      userIds: assignedUsers,
+      message: `You have been assigned a new task: ${title}`,
+      type: "task",
+      link: `/tasks/${task._id}`,
+    });
+  }
 
   res.status(201).json(task);
 };

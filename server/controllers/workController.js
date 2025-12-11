@@ -1,8 +1,9 @@
 const Work = require("../models/Work");
 const Task = require("../models/Task");
 const cloudinary = require("../config/cloudinary");
+const { createNotification } = require("../utils/notifications");
 
-// helper: upload single file buffer to Cloudinary
+// Upload helper
 const uploadFromBuffer = (file) => {
   return new Promise((resolve, reject) => {
     const b64 = Buffer.from(file.buffer).toString("base64");
@@ -47,6 +48,18 @@ const createWork = async (req, res) => {
     createdBy: req.user._id,
   });
 
+  // Notify ALL assigned users
+  const notifyUsers = task.assignedUsers;
+
+  if (notifyUsers.length > 0) {
+    await createNotification({
+      userIds: notifyUsers,
+      message: `New work added under task: ${task.title} - ${title}`,
+      type: "work",
+      link: `/tasks/${task._id}`,
+    });
+  }
+
   res.status(201).json(work);
 };
 
@@ -55,12 +68,13 @@ const createWork = async (req, res) => {
 // @access Private
 const getWorksByTask = async (req, res) => {
   const taskId = req.params.taskId;
-  console.log("Task ID:", taskId);
+
   if (!taskId) return res.status(400).json({ message: "Task ID is required" });
 
   const works = await Work.find({ task: taskId })
     .populate("createdBy", "name email display_image")
     .populate("task", "title");
+
   res.json(works);
 };
 
@@ -71,14 +85,15 @@ const getWorkById = async (req, res) => {
   const work = await Work.findById(req.params.id)
     .populate("createdBy", "name email display_image")
     .populate("task", "title");
+
   if (!work) return res.status(404).json({ message: "Work not found" });
+
   res.json(work);
 };
 
 // @desc Update work (only creator)
 // @route PUT /api/works/:id
 // @access Private
-// Body can include removeImagePublicIds: [string] to delete some images
 const updateWork = async (req, res) => {
   const work = await Work.findById(req.params.id);
   if (!work) return res.status(404).json({ message: "Work not found" });
@@ -97,7 +112,7 @@ const updateWork = async (req, res) => {
   if (timeRange !== undefined) work.timeRange = timeRange;
   if (shareUrl !== undefined) work.shareUrl = shareUrl;
 
-  // remove selected images
+  // Remove images
   let removeIds = [];
   if (removeImagePublicIds) {
     try {
@@ -110,15 +125,15 @@ const updateWork = async (req, res) => {
   }
 
   if (removeIds.length > 0) {
-    for (const publicId of removeIds) {
-      await cloudinary.uploader.destroy(publicId);
+    for (const pid of removeIds) {
+      await cloudinary.uploader.destroy(pid);
     }
     work.images = work.images.filter(
       (img) => !removeIds.includes(img.publicId)
     );
   }
 
-  // add new images (append)
+  // Add new images
   if (req.files && req.files.length > 0) {
     for (const file of req.files) {
       const result = await uploadFromBuffer(file);
@@ -127,6 +142,20 @@ const updateWork = async (req, res) => {
   }
 
   const updatedWork = await work.save();
+
+  // Notify assigned users
+  const parentTask = await Task.findById(work.task);
+  const notifyUsers = parentTask.assignedUsers;
+
+  if (notifyUsers.length > 0) {
+    await createNotification({
+      userIds: notifyUsers,
+      message: `Work updated under task: ${parentTask.title} - ${work.title}`,
+      type: "work",
+      link: `/tasks/${parentTask._id}`,
+    });
+  }
+
   res.json(updatedWork);
 };
 
@@ -143,12 +172,25 @@ const deleteWork = async (req, res) => {
       .json({ message: "Only the creator can delete this work" });
   }
 
-  // delete images from Cloudinary
   for (const img of work.images) {
     await cloudinary.uploader.destroy(img.publicId);
   }
 
+  const parentTask = await Task.findById(work.task);
+
   await work.deleteOne();
+
+  const notifyUsers = parentTask.assignedUsers;
+
+  if (notifyUsers.length > 0) {
+    await createNotification({
+      userIds: notifyUsers,
+      message: `A work was deleted under task: ${parentTask.title} - ${work.title}`,
+      type: "work",
+      link: `/tasks/${parentTask._id}`,
+    });
+  }
+
   res.json({ message: "Work deleted" });
 };
 

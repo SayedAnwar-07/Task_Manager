@@ -2,7 +2,8 @@ import "./globals.css";
 import { ReactNode } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import Link from "next/link";
-import { AuthProvider } from "./providers/AuthProvider";import Navbar from "@/components/shared/Navbar";
+import { AuthProvider, useAuth } from "./providers/AuthProvider";
+import Navbar from "@/components/shared/Navbar";
 import { Toaster } from "sonner";
 import { ThemeToggle } from "@/components/theme-toggle";
 

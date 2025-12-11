@@ -7,12 +7,13 @@ const {
   updateUser,
   deleteUser,
 } = require("../controllers/userController");
+const upload = require("../middleware/uploadMiddleware");
 
 router.get("/", protect, getUsers);
 router
   .route("/:id")
   .get(protect, getUserById)
-  .put(protect, updateUser)
+  .put(protect, upload.single("display_image"), updateUser)
   .delete(protect, deleteUser);
 
 module.exports = router;

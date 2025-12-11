@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/app/providers/AuthProvider";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import SafeImage from "../SafeImage";
-import { Menu, Home, User, LogOut } from "lucide-react";
+import { Menu, Home, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Navbar() {

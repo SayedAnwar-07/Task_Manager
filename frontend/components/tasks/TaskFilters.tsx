@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { TaskStatus } from '@/types/task';
+import { Task, TaskStatus } from '@/types/task';
 import { Search, X, Filter, Menu } from 'lucide-react';
 import {
   Sheet,
@@ -11,8 +11,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import TaskCalendar from './TaskCalendar';
 
 interface TaskFiltersProps {
+  tasks: Task[];
   search: string;
   filterStatus: TaskStatus | '';
   onSearchChange: (value: string) => void;
@@ -22,6 +24,7 @@ interface TaskFiltersProps {
 }
 
 export default function TaskFilters({
+  tasks,
   search,
   filterStatus,
   onSearchChange,
@@ -32,15 +35,12 @@ export default function TaskFilters({
   
   const [searchInput, setSearchInput] = useState(search);
 
-  // Sync local state if parent search changes externally
   useEffect(() => {
     setSearchInput(search);
   }, [search]);
 
   const handleStatusChange = (status: TaskStatus | '') => {
     onStatusChange(status);
-    // Optionally apply filters immediately for status
-    // onApplyFilters(); 
   };
 
   const handleClearAll = () => {
@@ -154,10 +154,14 @@ export default function TaskFilters({
                   className={`justify-start rounded-none text-left border ${filterStatus === 'done' ? 'bg-green-500 hover:bg-green-600 text-white' : 'border-green-500/20'}`}
                 >
                   <span className={`w-2 h-2 rounded-full mr-3 ${filterStatus === 'done' ? 'bg-white' : 'bg-green-500'}`}></span>
-                  Done
-                </Button>
-              </div>
-            </SheetContent>
+                    Done
+                  </Button>
+                </div>
+
+                <div className="mt-6">
+                  <TaskCalendar tasks={tasks} filterStatus={filterStatus}/>
+                </div>
+              </SheetContent>
           </Sheet>
         </div>
 

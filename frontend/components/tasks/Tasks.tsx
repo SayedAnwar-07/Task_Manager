@@ -28,6 +28,7 @@ import UpdateTask from './UpdateTask';
 import { toast } from 'sonner';
 import LiquidLoader from '../shared/LiquidLoader';
 import TaskFilters from './TaskFilters';
+import TaskCalendar from './TaskCalendar';
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -40,6 +41,7 @@ export default function Tasks() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<'pending' | 'in_progress' | 'done' | ''>('');
+
 
   const router = useRouter();
 
@@ -164,6 +166,7 @@ export default function Tasks() {
 
       {/* Use the TaskFilters component */}
       <TaskFilters
+        tasks={tasks}
         search={search}
         filterStatus={filterStatus}
         onSearchChange={handleSearchChange}
@@ -173,8 +176,11 @@ export default function Tasks() {
       />
 
       {/* Desktop Table View */}
-      <div className="hidden lg:block border bg-white dark:bg-[#101010]">
-        <Table>
+      <div className="hidden lg:flex gap-3">
+        <div className="">
+          <TaskCalendar tasks={tasks} filterStatus={filterStatus}/>
+        </div>
+        <Table className='border bg-white dark:bg-[#101010]'>
           <TableHeader>
             <TableRow>
               <TableHead className="font-semibold">Title</TableHead>

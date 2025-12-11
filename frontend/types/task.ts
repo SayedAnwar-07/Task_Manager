@@ -30,4 +30,8 @@ export interface CreateTaskData {
   assignedUsers: string[];
 }
 
+export interface TaskWithWorksCount extends Task {
+  worksCount: number;
+}
+
 export interface UpdateTaskData extends Partial<CreateTaskData> {}

@@ -104,7 +104,12 @@ export default function TaskCalendar({ tasks }: TaskCalendarProps) {
                   className="border p-2"
                 >
                   <h3 className="font-semibold flex justify-between">
-                    {task.title}
+                    <span>
+                      {task.title}
+                    <span className="text-sm m-1 rounded-full border bg-gray-100 dark:bg-white dark:text-black px-3">
+                      {task.workCount} works
+                    </span>
+                    </span>
                     <span
                         className={`
                             px-2 py-0.5 rounded text-white text-xs

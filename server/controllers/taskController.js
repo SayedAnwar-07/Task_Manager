@@ -1,6 +1,7 @@
 const Task = require("../models/Task");
 const Work = require("../models/Work");
 const cloudinary = require("../config/cloudinary");
+const mongoose = require("mongoose");
 
 // @desc Create task
 // @route POST /api/tasks
@@ -33,7 +34,6 @@ const getTasks = async (req, res) => {
   try {
     const { search, status } = req.query;
 
-    // Base: user created OR assigned
     let query = {
       $or: [{ createdBy: req.user._id }, { assignedUsers: req.user._id }],
     };
@@ -46,10 +46,35 @@ const getTasks = async (req, res) => {
       query.status = status;
     }
 
-    const tasks = await Task.find(query)
-      .populate("createdBy", "name email display_image")
-      .populate("assignedUsers", "name email display_image")
-      .sort({ createdAt: -1 });
+    const tasks = await Task.aggregate([
+      { $match: query },
+      {
+        $lookup: {
+          from: "works",
+          localField: "_id",
+          foreignField: "task",
+          as: "works",
+        },
+      },
+      {
+        $addFields: {
+          workCount: { $size: "$works" },
+        },
+      },
+
+      {
+        $project: {
+          works: 0,
+        },
+      },
+
+      { $sort: { createdAt: -1 } },
+    ]);
+
+    await Task.populate(tasks, [
+      { path: "createdBy", select: "name email display_image" },
+      { path: "assignedUsers", select: "name email display_image" },
+    ]);
 
     res.json(tasks);
   } catch (error) {
@@ -62,12 +87,42 @@ const getTasks = async (req, res) => {
 // @route GET /api/tasks/:id
 // @access Private
 const getTaskById = async (req, res) => {
-  const task = await Task.findById(req.params.id)
-    .populate("createdBy", "name email display_image")
-    .populate("assignedUsers", "name email display_image");
+  const taskId = req.params.id;
 
-  if (!task) return res.status(404).json({ message: "Task not found" });
-  res.json(task);
+  if (!mongoose.Types.ObjectId.isValid(taskId)) {
+    return res.status(400).json({ message: "Invalid Task ID" });
+  }
+
+  const task = await Task.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(taskId) } },
+
+    {
+      $lookup: {
+        from: "works",
+        localField: "_id",
+        foreignField: "task",
+        as: "works",
+      },
+    },
+
+    {
+      $addFields: {
+        workCount: { $size: "$works" },
+      },
+    },
+
+    { $project: { works: 0 } },
+  ]);
+
+  if (!task || task.length === 0)
+    return res.status(404).json({ message: "Task not found" });
+
+  await Task.populate(task, [
+    { path: "createdBy", select: "name email display_image" },
+    { path: "assignedUsers", select: "name email display_image" },
+  ]);
+
+  res.json(task[0]);
 };
 
 // @desc Update task (only creator)

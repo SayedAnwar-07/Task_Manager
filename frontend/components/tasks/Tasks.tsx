@@ -29,8 +29,12 @@ import { toast } from 'sonner';
 import LiquidLoader from '../shared/LiquidLoader';
 import TaskFilters from './TaskFilters';
 import TaskCalendar from './TaskCalendar';
+import { useAuth } from '@/app/providers/AuthProvider';
 
 export default function Tasks() {
+  const { user } = useAuth(); 
+  const currentUserId = user?._id;
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -200,6 +204,7 @@ export default function Tasks() {
                   onClick={() => handleViewDetails(task._id)}
                 >
                   {task.title}
+                  
                 </TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(task.status)}>
@@ -248,23 +253,30 @@ export default function Tasks() {
                         <Eye className="mr-2 h-4 w-4" />
                         View Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedTask(task);
-                          setIsUpdateOpen(true);
-                        }}
-                      >
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit Task
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={() => openDeleteAlert(task._id)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete Task
-                      </DropdownMenuItem>
+
+                       {/* Only show if current user is the creator */}
+                        {task.createdBy._id === currentUserId && (
+                          <>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedTask(task);
+                                setIsUpdateOpen(true);
+                              }}
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit Task
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => openDeleteAlert(task._id)}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete Task
+                            </DropdownMenuItem>
+                          </>
+                        )}
+
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -288,34 +300,35 @@ export default function Tasks() {
                   {task.title}
                 </h3>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => {
-                      setSelectedTask(task);
-                      setIsUpdateOpen(true);
-                    }}
-                  >
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit Task
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-red-600"
-                    onClick={() => openDeleteAlert(task._id)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Task
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
+              {task.createdBy._id === currentUserId && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setSelectedTask(task);
+                        setIsUpdateOpen(true);
+                      }}
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit Task
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => openDeleteAlert(task._id)}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete Task
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>            
             {/* Status and Deadline */}
             <div className="flex flex-wrap justify-between gap-3 mb-4">
               <div className="flex items-start gap-2">

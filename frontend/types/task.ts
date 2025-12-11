@@ -12,6 +12,7 @@ export interface Task {
   title: string;
   description: string;
   status: TaskStatus;
+  workCount: number;
   startDate: string;
   deadline: string;
   createdBy: User;
@@ -30,8 +31,5 @@ export interface CreateTaskData {
   assignedUsers: string[];
 }
 
-export interface TaskWithWorksCount extends Task {
-  worksCount: number;
-}
 
 export interface UpdateTaskData extends Partial<CreateTaskData> {}

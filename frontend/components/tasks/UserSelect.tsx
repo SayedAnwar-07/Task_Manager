@@ -95,7 +95,7 @@ export default function UserSelect({
         </PopoverTrigger>
         <PopoverContent className="w-full p-0 bg-white dark:bg-[#3c3c3c] border-gray-300 dark:border-gray-700">
           <Command>
-            <CommandInput placeholder="Search users..." />
+            
             <CommandList>
               <CommandEmpty>No users found.</CommandEmpty>
               <CommandGroup>

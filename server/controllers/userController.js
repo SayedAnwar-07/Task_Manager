@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const cloudinary = require("../config/cloudinary");
+const { cloudinary, streamUpload } = require("../config/cloudinary");
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
@@ -12,55 +12,42 @@ const generateToken = (id) => {
 // @access Public
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Please add all fields" });
     }
 
-    // Check if user exists
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+    const allowedRoles = ["owner", "co_owner", "project_manager"];
+    if (role && !allowedRoles.includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
     }
 
+    const userExists = await User.findOne({ email });
+    if (userExists)
+      return res.status(400).json({ message: "User already exists" });
+
+    // Handle display image
     let display_image = null;
-
     if (req.file) {
-      const streamUpload = (fileBuffer) => {
-        return new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { folder: "users" },
-            (error, result) => {
-              if (error) return reject(error);
-              resolve(result);
-            }
-          );
-          stream.end(fileBuffer);
-        });
-      };
-
-      const result = await streamUpload(req.file.buffer);
+      const result = await streamUpload(req.file.buffer, "users");
       display_image = result.secure_url;
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create user
     const user = await User.create({
       name,
       email,
-      password: hashedPassword,
+      password,
       display_image,
+      role: role || "project_manager",
     });
 
     res.status(201).json({
       _id: user._id,
-      display_image: user.display_image || null,
+      display_image: user.display_image,
       name: user.name,
       email: user.email,
+      role: user.role,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -73,19 +60,30 @@ const registerUser = async (req, res) => {
 // @route POST /api/auth/login
 // @access Public
 const authUser = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      display_image: user.display_image,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id),
-    });
-  } else {
-    res.status(401).json({ message: "Invalid email or password" });
+    if (!email || !password)
+      return res
+        .status(400)
+        .json({ message: "Please provide email and password" });
+
+    const user = await User.findOne({ email });
+    if (user && (await user.matchPassword(password))) {
+      res.json({
+        _id: user._id,
+        display_image: user.display_image,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(401).json({ message: "Invalid email or password" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -93,8 +91,22 @@ const authUser = async (req, res) => {
 // @route GET /api/users
 // @access Private
 const getUsers = async (req, res) => {
-  const users = await User.find().select("-password");
-  res.json(users);
+  try {
+    let users;
+
+    if (req.user.role === "project_manager") {
+      // Only project_manager users
+      users = await User.find({ role: "project_manager" }).select("-password");
+    } else {
+      // owner or co_owner → all users
+      users = await User.find().select("-password");
+    }
+
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 // @desc Get single user
@@ -132,20 +144,7 @@ const updateUser = async (req, res) => {
 
     // Handle file upload
     if (req.file) {
-      const streamUpload = (fileBuffer) => {
-        return new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { folder: "users" },
-            (error, result) => {
-              if (error) return reject(error);
-              resolve(result);
-            }
-          );
-          stream.end(fileBuffer);
-        });
-      };
-
-      const result = await streamUpload(req.file.buffer);
+      const result = await streamUpload(req.file.buffer, "users");
       user.display_image = result.secure_url;
     }
 
@@ -154,8 +153,7 @@ const updateUser = async (req, res) => {
     user.email = req.body.email || user.email;
 
     if (req.body.password) {
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(req.body.password, salt);
+      user.password = req.body.password;
     }
 
     const updatedUser = await user.save();
@@ -164,6 +162,7 @@ const updateUser = async (req, res) => {
       display_image: updatedUser.display_image,
       name: updatedUser.name,
       email: updatedUser.email,
+      role: updatedUser.role,
     });
   } catch (error) {
     console.error(error);

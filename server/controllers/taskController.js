@@ -3,6 +3,7 @@ const Work = require("../models/Work");
 const cloudinary = require("../config/cloudinary");
 const mongoose = require("mongoose");
 const { createNotification } = require("../utils/notifications");
+const User = require("../models/User");
 
 // @desc Create task
 // @route POST /api/tasks
@@ -13,6 +14,20 @@ const createTask = async (req, res) => {
 
   if (!title) {
     return res.status(400).json({ message: "Title is required" });
+  }
+
+  if (assignedUsers && assignedUsers.length > 0) {
+    const users = await User.find({ _id: { $in: assignedUsers } });
+
+    if (req.user.role === "project_manager") {
+      const invalidAssignment = users.some((u) => u.role !== "project_manager");
+      if (invalidAssignment) {
+        return res.status(403).json({
+          message:
+            "As a project_manager, you can only assign tasks to project_manager users.",
+        });
+      }
+    }
   }
 
   const task = await Task.create({
@@ -157,7 +172,21 @@ const updateTask = async (req, res) => {
   if (status !== undefined) task.status = status;
   if (startDate !== undefined) task.startDate = startDate;
   if (deadline !== undefined) task.deadline = deadline;
-  if (assignedUsers !== undefined) task.assignedUsers = assignedUsers;
+  if (assignedUsers !== undefined) {
+    const users = await User.find({ _id: { $in: assignedUsers } });
+
+    if (req.user.role === "project_manager") {
+      const invalidAssignment = users.some((u) => u.role !== "project_manager");
+      if (invalidAssignment) {
+        return res.status(403).json({
+          message:
+            "As a project_manager, you can only assign tasks to project_manager users.",
+        });
+      }
+    }
+
+    task.assignedUsers = assignedUsers;
+  }
 
   const updatedTask = await task.save();
   res.json(updatedTask);

@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+
+import Cropper from "react-easy-crop";
+import { Area } from "react-easy-crop";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,18 +22,78 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Preview image when user selects a file
+  // === CROPPER STATES ===
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [isCropping, setIsCropping] = useState(false);
+
+  const onCropComplete = useCallback(
+      (_: Area, croppedPixels: Area) => {
+        setCroppedAreaPixels(croppedPixels);
+      },
+      []
+    );
+
+  // === Helper function: crop and return blob ===
+  const createImage = (url: string): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.addEventListener("load", () => resolve(img));
+      img.addEventListener("error", (err) => reject(err));
+      img.src = url;
+    });
+
+  const getCroppedImg = async (imageSrc: string, pixelCrop: any): Promise<Blob> => {
+    const image = await createImage(imageSrc);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = pixelCrop.width;
+    canvas.height = pixelCrop.height;
+
+    if (!ctx) throw new Error("Canvas context is null");
+
+    ctx.drawImage(
+      image,
+      pixelCrop.x,
+      pixelCrop.y,
+      pixelCrop.width,
+      pixelCrop.height,
+      0,
+      0,
+      pixelCrop.width,
+      pixelCrop.height
+    );
+
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => resolve(blob!), "image/jpeg");
+    });
+  };
+
+  // === UPDATED handleFileChange for cropping ===
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    setDisplayImage(file);
+    if (!file) return;
 
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setPreview(reader.result as string);
-      reader.readAsDataURL(file);
-    } else {
-      setPreview(null);
-    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+      setIsCropping(true); // open modal
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // === Finalize crop ===
+  const handleCropDone = async () => {
+    if (!preview || !croppedAreaPixels) return;
+
+    const blob = await getCroppedImg(preview, croppedAreaPixels);
+    const croppedFile = new File([blob], "profile.jpg", { type: "image/jpeg" });
+
+    setDisplayImage(croppedFile);
+    setPreview(URL.createObjectURL(croppedFile));
+    setIsCropping(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,7 +109,7 @@ export default function RegisterPage() {
 
       const data = await apiFetch("/api/auth/register", {
         method: "POST",
-        body: formData, // send FormData to backend
+        body: formData,
       });
 
       if (typeof window !== "undefined") {
@@ -57,6 +120,7 @@ export default function RegisterPage() {
             id: data._id,
             name: data.name,
             email: data.email,
+            role: data.role,
             display_image: data.display_image || null,
           })
         );
@@ -71,30 +135,79 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex items-center justify-center mt-10">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-1">Create an account</h1>
-          <p className="text-slate-600 dark:text-gray-300 text-sm">
-            Sign up to get started with our platform
-          </p>
-        </div>
+    <>
+      {/* === CROPPER MODAL === */}
+      {isCropping && preview && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded shadow-lg w-[90vw] max-w-md">
+            <div className="relative w-full h-64">
+              <Cropper
+                image={preview}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
 
-        <div className="border-slate-200 dark:border-slate-700 border dark:bg-[#101010] bg-white">
-          <form onSubmit={handleSubmit} className="p-8">
-            {error && (
-              <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 text-sm flex items-center">
-                {error}
-              </div>
-            )}
-            {/* Display Image */}
+            <input
+              type="range"
+              value={zoom}
+              min={1}
+              max={3}
+              step={0.1}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              className="w-full mt-4"
+            />
+
+            <div className="flex justify-between mt-4">
+              <button
+                type="button"
+                onClick={() => setIsCropping(false)}
+                className="px-4 py-2 bg-gray-300 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCropDone}
+                className="px-4 py-2 bg-[#2b564e] text-white rounded"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* === ORIGINAL REGISTER UI BELOW (UNCHANGED) === */}
+      <div className="flex items-center justify-center mt-10">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold tracking-tight mb-1">Create an account</h1>
+            <p className="text-slate-600 dark:text-gray-300 text-sm">
+              Sign up to get started with our platform
+            </p>
+          </div>
+
+          <div className="border-slate-200 dark:border-slate-700 border dark:bg-[#101010] bg-white">
+            <form onSubmit={handleSubmit} className="p-8">
+              {error && (
+                <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 text-sm flex items-center">
+                  {error}
+                </div>
+              )}
+
               {preview && (
-                  <img
-                    src={preview}
-                    alt="Preview"
-                    className="mt-2 w-20 h-20 object-cover rounded-full border border-slate-300"
-                  />
-                )}
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="mt-2 w-20 h-20 object-cover rounded-full border border-slate-300"
+                />
+              )}
+
               <div className="my-4">
                 <label className="block text-xs font-medium uppercase tracking-wider mb-2">
                   Profile Picture
@@ -105,88 +218,86 @@ export default function RegisterPage() {
                   onChange={handleFileChange}
                   className="border border-slate-200 dark:border-slate-700 rounded-none px-3 py-2.5 text-sm w-full"
                 />
-                
               </div>
 
-            <div className="space-y-6">
-              {/* Name */}
-              <div>
-                <label className="block text-xs font-medium uppercase tracking-wider mb-2">
-                  Full Name
-                </label>
-                <Input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
-                  className="border border-slate-200 dark:border-slate-700 rounded-none px-3 py-2.5 text-sm bg-gray-50"
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-xs font-medium uppercase tracking-wider mb-2">
-                  Email address
-                </label>
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="border border-slate-200 dark:border-slate-700 rounded-none px-3 py-2.5 text-sm bg-gray-50"
-                />
-              </div>
-
-              {/* Password */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="block text-xs font-medium uppercase tracking-wider">
-                    Password
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-xs font-medium uppercase tracking-wider mb-2">
+                    Full Name
                   </label>
-                </div>
-                <div className="relative">
                   <Input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a strong password"
-                    className="border border-slate-200 dark:border-slate-700 bg-gray-50 rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm pr-10"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="John Doe"
+                    className="border border-slate-200 dark:border-slate-700 rounded-none px-3 py-2.5 text-sm bg-gray-50"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
+
+                <div>
+                  <label className="block text-xs font-medium uppercase tracking-wider mb-2">
+                    Email address
+                  </label>
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="border border-slate-200 dark:border-slate-700 rounded-none px-3 py-2.5 text-sm bg-gray-50"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-xs font-medium uppercase tracking-wider">
+                      Password
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Create a strong password"
+                      className="border border-slate-200 dark:border-slate-700 bg-gray-50 rounded-none placeholder-slate-400 focus:ring-none px-3 py-2.5 text-sm pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#2b564e] rounded-none hover:bg-slate-900 text-white py-3 font-medium text-sm uppercase tracking-wider transition-all duration-200 border-0"
+                >
+                  {loading ? "Creating Account..." : "Sign Up"}
+                </Button>
               </div>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#2b564e] rounded-none hover:bg-slate-900 text-white py-3 font-medium text-sm uppercase tracking-wider transition-all duration-200 border-0"
-              >
-                {loading ? "Creating Account..." : "Sign Up"}
-              </Button>
-            </div>
 
-            <div className="my-6 flex items-center">
-              <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-              <span className="flex-shrink mx-4 text-slate-400 text-xs">OR</span>
-              <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-            </div>
+              <div className="my-6 flex items-center">
+                <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+                <span className="flex-shrink mx-4 text-slate-400 text-xs">OR</span>
+                <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+              </div>
 
-            <div className="text-center">
-              <p className="text-sm">
-                Already have an account?{" "}
-                <Link href="/login" className="text-[#2b564e] hover:underline font-medium">
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          </form>
+              <div className="text-center">
+                <p className="text-sm">
+                  Already have an account?{" "}
+                  <Link href="/login" className="text-[#2b564e] hover:underline font-medium">
+                    Sign in
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

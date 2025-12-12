@@ -17,7 +17,7 @@ import { NotificationsBell } from "../NotificationsBell";
 
 export default function Navbar() {
   const { user, isLoggedIn, logout } = useAuth();
-  console.log("Logged in user :", user)
+  // console.log("Logged in user :", user)
 
   // Safe fallback avatar
   const avatar = user?.display_image ||

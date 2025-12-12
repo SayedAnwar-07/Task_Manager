@@ -35,7 +35,6 @@ export default function UserSelect({
   const [users, setUsers] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth(); 
-  console.log("Logged in user :", user);
 
   useEffect(() => {
     fetchUsers();
@@ -46,20 +45,17 @@ export default function UserSelect({
       setLoading(true);
       const data = await userApi.getAll();
 
-      // Dynamically get the logged-in user's role from the context
-      const loggedInUserRole = user?.role; // user role from auth context
+      const loggedInUserRole = user?.role; 
 
       let filteredUsers: UserType[] = [];
 
-      // If logged-in user is 'owner' or 'co_owner', show all users
       if (loggedInUserRole === 'owner' || loggedInUserRole === 'co_owner') {
-        filteredUsers = data; // Show all users
+        filteredUsers = data; 
       } else if (loggedInUserRole === 'project_manager') {
-        // If logged-in user is 'project_manager', show only 'project_manager' users
         filteredUsers = data.filter(user => user.role === 'project_manager');
       }
 
-      setUsers(filteredUsers); // Set the filtered users
+      setUsers(filteredUsers);
     } catch (error) {
       console.error('Failed to fetch users:', error);
     } finally {
@@ -140,7 +136,7 @@ export default function UserSelect({
                               {user.name}
                             </span>
                             <span className="text-sm text-gray-500 dark:text-gray-400">
-                              {user.email} - {user.role}
+                              {user.email}
                             </span>
                           </div>
                         </div>

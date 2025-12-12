@@ -15,7 +15,7 @@ const Notified: React.FC<NotifiedProps> = ({
   userId,
   showBadge = true,
   autoRefresh = true,
-  refreshInterval = 30000, // 30 seconds
+  refreshInterval = 30000, 
 }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);

@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +5,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
@@ -19,6 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { userApi, User as UserType } from '@/lib/user-api';
+import { useAuth } from '@/app/providers/AuthProvider'; 
 
 interface UserSelectProps {
   value: string[];
@@ -36,16 +34,32 @@ export default function UserSelect({
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth(); 
+  console.log("Logged in user :", user);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [user]); 
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const data = await userApi.getAll();
-      setUsers(data);
+
+      // Dynamically get the logged-in user's role from the context
+      const loggedInUserRole = user?.role; // user role from auth context
+
+      let filteredUsers: UserType[] = [];
+
+      // If logged-in user is 'owner' or 'co_owner', show all users
+      if (loggedInUserRole === 'owner' || loggedInUserRole === 'co_owner') {
+        filteredUsers = data; // Show all users
+      } else if (loggedInUserRole === 'project_manager') {
+        // If logged-in user is 'project_manager', show only 'project_manager' users
+        filteredUsers = data.filter(user => user.role === 'project_manager');
+      }
+
+      setUsers(filteredUsers); // Set the filtered users
     } catch (error) {
       console.error('Failed to fetch users:', error);
     } finally {
@@ -95,7 +109,6 @@ export default function UserSelect({
         </PopoverTrigger>
         <PopoverContent className="w-full p-0 bg-white dark:bg-[#3c3c3c] border-gray-300 dark:border-gray-700">
           <Command>
-            
             <CommandList>
               <CommandEmpty>No users found.</CommandEmpty>
               <CommandGroup>
@@ -127,13 +140,11 @@ export default function UserSelect({
                               {user.name}
                             </span>
                             <span className="text-sm text-gray-500 dark:text-gray-400">
-                              {user.email}
+                              {user.email} - {user.role}
                             </span>
                           </div>
                         </div>
-                        {isSelected && (
-                          <Check className="h-4 w-4 text-[#2b564e]" />
-                        )}
+                        {isSelected && <Check className="h-4 w-4 text-[#2b564e]" />}
                       </div>
                     </CommandItem>
                   );

@@ -56,6 +56,7 @@ export default function LoginPage() {
             _id: data._id ?? data.id,
             name: data.name,
             email: data.email,
+            role: data.role,
             display_image: data.display_image || null,
           })
         );

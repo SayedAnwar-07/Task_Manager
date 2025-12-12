@@ -2,6 +2,7 @@ export interface User {
   _id: string;
   name: string;
   email: string;
+  role: 'owner' | 'co_owner' | 'project_manager';
   display_image?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -22,6 +23,6 @@ export const userApi = {
       throw new Error(`Failed to fetch users: ${response.status}`);
     }
     
-    return response.json();
+    return response.json() as Promise<User[]>;
   },
 };

@@ -78,7 +78,7 @@ export default function TaskCalendar({ tasks }: TaskCalendarProps) {
         }}
         modifiersClassNames={{
           taskDay:
-            "bg-[#2b564e] text-white hover:bg-[#2b564e]/90 border-gray-800 dark:border-gray-500 border rounded-full transition-all",
+            "bg-red-600 text-white hover:bg-red-700 border-gray-800 dark:border-gray-500 border rounded-full transition-all",
         }}
       />
 

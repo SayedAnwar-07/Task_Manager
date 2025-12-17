@@ -30,6 +30,7 @@ import LiquidLoader from '../shared/LiquidLoader';
 import TaskFilters from './TaskFilters';
 import TaskCalendar from './TaskCalendar';
 import { useAuth } from '@/app/providers/AuthProvider';
+import { formatDateTime } from '@/lib/date';
 
 export default function Tasks() {
   const { user } = useAuth(); 
@@ -45,6 +46,37 @@ export default function Tasks() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<'pending' | 'in_progress' | 'done' | ''>('');
+
+
+  const getDeadlineText = (deadline: string | Date) => {
+    const today = new Date();
+    const endDate = new Date(deadline);
+
+    // Remove time (important!)
+    today.setHours(0, 0, 0, 0);
+    endDate.setHours(0, 0, 0, 0);
+
+    const diffDays =
+      (endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+
+    if (diffDays === 0) {
+      return { text: "Today", color: "text-red-600" };
+    }
+
+    if (diffDays === 1) {
+      return { text: "Tomorrow", color: "text-orange-500" };
+    }
+
+    return {
+      text: endDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      }),
+      color: "text-gray-900 dark:text-gray-100",
+    };
+  };
+
 
 
   const router = useRouter();
@@ -142,7 +174,7 @@ export default function Tasks() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center mt-20">
         <LiquidLoader size="md" showText={true} speed={1.5} />
       </div>
     );
@@ -203,7 +235,7 @@ export default function Tasks() {
                   className="font-medium cursor-pointer hover:text-[#2b564e]"
                   onClick={() => handleViewDetails(task._id)}
                 >
-                  {task.title}
+                 {task.title.length > 18 ? task.title.slice(0, 18) + "…" : task.title}
                   
                 </TableCell>
                 <TableCell>
@@ -296,9 +328,27 @@ export default function Tasks() {
             {/* Header Section */}
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {task.title}
-                </h3>
+                {/* creator name */}
+                <div className="flex items-start gap-2">
+                  <img
+                        src={task.createdBy.display_image}
+                        alt={task.createdBy.name}
+                        className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800 object-cover"
+                      />
+                  <div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 flex gap-1">
+                     <span> Created by</span>
+                      <span className="text-xs">
+                        ({task?.startDate ? formatDateTime(task.startDate) : "—"})
+                      </span>
+                    </p>
+
+                    <p className="text-sm font-medium truncate max-w-[120px]">
+                      {task.createdBy.name}
+                    </p>                   
+                  </div>
+                </div>
+                
               </div>
               {task.createdBy._id === currentUserId && (
                 <DropdownMenu>
@@ -329,47 +379,39 @@ export default function Tasks() {
                 </DropdownMenu>
               )}
             </div>            
-            {/* Status and Deadline */}
-            <div className="flex flex-wrap justify-between gap-3 mb-4">
-              <div className="flex items-start gap-2">
-                <div className={`w-3 h-3 rounded-full ${
-                  task.status === 'done' ? 'bg-green-500' :
-                  task.status === 'in_progress' ? 'bg-blue-500' :
-                  'bg-yellow-500'
-                }`}></div>
-                <div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Status</p>
-                  <p className="text-sm font-medium capitalize">
-                    {task.status.replace('_', ' ')}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-2">
-                <Calendar className="h-4 w-4 text-gray-400" />
-                <div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Deadline</p>
-                  <p className="text-sm font-medium">{formatDate(task.deadline)}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Assigned Users and Created By */}
             
-            <div className="flex items-center justify-between">
-              <div className="flex items-start gap-2">
-                <img
-                      src={task.createdBy.display_image}
-                      alt={task.createdBy.name}
-                      className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800 object-cover"
-                    />
-                <div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Created By</p>
-                  <p className="text-sm font-medium truncate max-w-[120px]">
-                    {task.createdBy.name}
+          
+            <div className="flex flex-col items-start mb-3">
+                {/* title */}
+                <div className='flex justify-between items-center w-full mb-2'>
+                     <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {task.title}
+                      </h3>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Badge
+                          className={`capitalize text-white ${
+                            task.status === "done"
+                              ? "bg-green-600"
+                              : task.status === "in_progress"
+                              ? "bg-blue-600"
+                              : "bg-yellow-600"
+                          }`}
+                        >
+                          {task.status.replace("_", " ")}
+                        </Badge>
+                      </div>
+                                      </div>
+                {task?.description && (
+                  <p className="text-xs text-gray-600 dark:text-gray-300 border p-2">
+                    {task.description}
                   </p>
-                </div>
-              </div>
+                )}
+
+            </div> 
+
+            <div className="flex flex-wrap justify-between gap-3 mb-4">
+              
+              {/* assigned users */}
               <div className="flex items-start gap-2">
                  <Users className="h-4 w-4 text-gray-400" />
               <div className="flex flex-col items-start">
@@ -392,7 +434,26 @@ export default function Tasks() {
                 </div>
               </div>
               </div>
+
+              {/* deadline */}
+              <div className="flex items-start gap-2">
+                <Calendar className="h-4 w-4 text-gray-400" />
+                <div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Deadline</p>
+                  {(() => {
+                    const deadline = getDeadlineText(task.deadline);
+                    return (
+                      <p className={`text-xs font-medium ${deadline.color}`}>
+                        {deadline.text}
+                      </p>
+                    );
+                  })()}
+                </div>
+              </div>
+
+             
             </div>
+
 
             {/* Click indicator */}
             <div className="mt-4 pt-3 border-t dark:border-gray-800"  onClick={() => handleViewDetails(task._id)}>

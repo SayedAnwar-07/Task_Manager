@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/app/providers/AuthProvider";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import SafeImage from "../SafeImage";
-import { Menu, Home, LogOut } from "lucide-react";
+import { Menu, Home, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationsBell } from "../NotificationsBell";
 
@@ -63,6 +63,13 @@ export default function Navbar() {
                 <Link href="/dashboard" className="flex items-center w-full">
                   <Home className="mr-2 h-4 w-4" />
                   Dashboard
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild>
+                <Link href="/profile" className="flex items-center w-full">
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
                 </Link>
               </DropdownMenuItem>
 
@@ -131,12 +138,21 @@ export default function Navbar() {
               <div className="flex-1 p-4">
                 <nav className="space-y-2">
                   {isLoggedIn ? (
-                    <Link href="/dashboard">
-                      <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <Home className="h-5 w-5" />
-                        <span>Dashboard</span>
-                      </div>
-                    </Link>
+                    <div>
+                      <Link href="/dashboard">
+                        <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                          <Home className="h-5 w-5" />
+                          <span>Dashboard</span>
+                        </div>
+                      </Link>
+                      <Link href="/profile">                   
+                        <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                           <User className="h-5 w-5" />
+                            Profile
+                        </div>
+                      </Link>
+                    </div>
+                    
                   ) : (
                     <Link href="/">
                       <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
@@ -144,6 +160,7 @@ export default function Navbar() {
                         <span>Home</span>
                       </div>
                     </Link>
+                    
                   )}
                 </nav>
               </div>

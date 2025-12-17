@@ -29,19 +29,23 @@ interface Notification {
 
 export function NotificationsBell() {
   const { token, user } = useAuth();
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Determine user-specific read status
   const isRead = (n: Notification) => {
     if (!user) return false;
-    return n.readBy.includes(user._id);
+    return n.readBy?.includes(user._id);
   };
 
-  // Only count notifications this user has NOT read
+  const isReminder = (n: Notification) =>
+    n.message.toLowerCase().includes("reminder");
+
+  // 🔔 Count unread notifications
   const unreadCount = notifications.filter((n) => !isRead(n)).length;
 
+  // 📡 Fetch notifications
   const fetchNotifications = async () => {
     if (!token) return;
     try {
@@ -69,6 +73,7 @@ export function NotificationsBell() {
     }
   };
 
+  // ✅ Mark notification as read
   const markAsRead = async (id: string) => {
     if (!token) return;
     try {
@@ -86,7 +91,6 @@ export function NotificationsBell() {
 
       const updated: Notification = await res.json();
 
-      // Update frontend list instantly
       setNotifications((prev) =>
         prev.map((n) => (n._id === updated._id ? updated : n))
       );
@@ -95,8 +99,12 @@ export function NotificationsBell() {
     }
   };
 
+  // 🔁 Initial fetch + auto refresh every 1 minute
   useEffect(() => {
     fetchNotifications();
+
+    const interval = setInterval(fetchNotifications, 60 * 1000);
+    return () => clearInterval(interval);
   }, [token]);
 
   return (
@@ -133,36 +141,39 @@ export function NotificationsBell() {
 
         <DropdownMenuSeparator />
 
-        {/* Loading State */}
+        {/* Loading */}
         {loading && (
           <div className="p-4 text-sm text-muted-foreground">
             Loading notifications...
           </div>
         )}
 
-        {/* Error State */}
+        {/* Error */}
         {error && (
           <div className="p-4 text-sm text-red-500">{error}</div>
         )}
 
-        {/* Empty State */}
+        {/* Empty */}
         {!loading && !error && notifications.length === 0 && (
           <div className="p-4 text-sm text-muted-foreground">
             No notifications yet.
           </div>
         )}
 
-        {/* Notifications List */}
+        {/* Notifications */}
         {!loading && !error && notifications.length > 0 && (
           <ScrollArea className="max-h-80">
             <div className="space-y-1 p-1">
               {notifications.map((n) => (
                 <DropdownMenuItem
                   key={n._id}
-                  className="flex items-start gap-2 px-2 py-2"
-                  onSelect={(e) => e.preventDefault()}
+                  className="flex items-start gap-2 px-2 py-2 cursor-pointer"
+                  onClick={() => {
+                    if (!isRead(n)) markAsRead(n._id);
+                    if (n.link) window.location.href = n.link;
+                  }}
                 >
-                  {/* Read / Unread Dot */}
+                  {/* Read indicator */}
                   <div className="mt-1">
                     {isRead(n) ? (
                       <CheckCheck className="h-4 w-4 text-muted-foreground" />
@@ -173,8 +184,11 @@ export function NotificationsBell() {
 
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between gap-2">
-                      <Badge variant="outline" className="text-[10px] uppercase">
-                        {n.type}
+                      <Badge
+                        variant={isReminder(n) ? "destructive" : "outline"}
+                        className="text-[10px] uppercase"
+                      >
+                        {isReminder(n) ? "REMINDER" : n.type}
                       </Badge>
 
                       <span className="text-[10px] text-muted-foreground">
@@ -182,20 +196,28 @@ export function NotificationsBell() {
                       </span>
                     </div>
 
-                    <p className="text-xs leading-snug">{n.message}</p>
+                    <p
+                      className={`text-xs leading-snug ${
+                        isReminder(n) && !isRead(n)
+                          ? "font-medium text-orange-600"
+                          : ""
+                      }`}
+                    >
+                      {n.message}
+                    </p>
 
-                    {/* Mark as read button */}
-                    <div className="flex items-center gap-2 pt-1">
-                      {!isRead(n) && (
-                        <Button
-                          variant="ghost"
-                          className="text-[11px] text-blue-600"
-                          onClick={() => markAsRead(n._id)}
-                        >
-                          Mark as read
-                        </Button>
-                      )}
-                    </div>
+                    {!isRead(n) && (
+                      <Button
+                        variant="ghost"
+                        className="px-0 text-[11px] text-blue-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          markAsRead(n._id);
+                        }}
+                      >
+                        Mark as read
+                      </Button>
+                    )}
                   </div>
                 </DropdownMenuItem>
               ))}
